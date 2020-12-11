@@ -6,6 +6,9 @@
     <title th:text="'课程'+${session.course.name}+'的信息'"></title>
 </head>
 <body>
+<label for="role"></label>
+<input hidden="hidden" id="role"
+       th:value="${session.teacher == null ? 'administrator':'teacher'}"/>
 课&nbsp;&nbsp;程&nbsp;&nbsp;号：&nbsp;<label for="id"></label><input readonly="readonly" id="id"
                                                                  th:value="${session.course.id}"/><br/>
 课&nbsp;&nbsp;程&nbsp;&nbsp;名：<label>
@@ -29,7 +32,8 @@
                                       th:value="${session.course.getExamTimeDateTime()}"/><br/>
 
 <input type="button" value="修改" onclick="updateCourse()">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-<input type="button" onclick="window.location.href='administratorMain'" value="返回主页">
+<input type="button"
+       onclick="toMain()" value="返回主页">
 
 <script type="text/javascript">
     $(function () {
@@ -38,6 +42,11 @@
         exam_time = exam_time.substr(0, 5);
         exam_time_element.val(exam_time);
     });
+
+    function toMain() {
+        var role = $("#role").val();
+        window.location.href = (role == 'teacher'?'teacherCourse':'courseDo');
+    }
 
     function updateCourse() {
         var id = $("#id").val();
@@ -59,6 +68,8 @@
             "class_address": class_address, "exam_time": exam_time
         };
 
+        var role = $("#role").val();
+
         $.ajax({
             type: "PUT",
             url: 'course',
@@ -66,7 +77,7 @@
             datatype: "json",
             success: function (data) {
                 console.log(data);
-                window.location.href = "courseDo";
+                window.location.href = (role == 'teacher'?'teacherCourse':'courseDo');
             }
         });
     }

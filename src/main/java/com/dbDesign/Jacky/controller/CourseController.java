@@ -7,6 +7,7 @@ import com.dbDesign.Jacky.model.dto.JSONResponse;
 import com.dbDesign.Jacky.model.entity.Course;
 import com.dbDesign.Jacky.model.vo.ServiceResult;
 import com.dbDesign.Jacky.service.CourseService;
+import com.dbDesign.Jacky.service.intermediateService.StudentCourseService;
 import com.dbDesign.Jacky.util.ListUtil;
 import com.dbDesign.Jacky.util.ParamUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,10 +30,16 @@ import java.util.List;
 @RequestMapping("/course")
 public class CourseController {
     private CourseService courseService;
+    private StudentCourseService studentCourseService;
 
     @Autowired
     public void setCourseService(CourseService courseService) {
         this.courseService = courseService;
+    }
+
+    @Autowired
+    public void setStudentCourseService(StudentCourseService studentCourseService) {
+        this.studentCourseService = studentCourseService;
     }
 
     /**
@@ -315,6 +322,43 @@ public class CourseController {
             return JSONResponseEnum.SUCCESS_WITHOUT_DATA_RESPONSE.getResponseValue();
         } else if (resultCode.equals(CodeEnum.NULL_RESULT.getCode())) {
             // 返回值为空状态
+            return JSONResponseEnum.NULL_RESULT_RESPONSE.getResponseValue();
+        }
+        return JSONResponseEnum.OTHER_ERROR_RESPONSE.getResponseValue();
+    }
+
+    /**
+     * @Author Jacky
+     * @Param studentId 指定的 student 的 id
+     * @Description 根据指定的 student 获取选修的 course 集合
+     **/
+    @GetMapping(value = "/student")
+    @ResponseBody
+    public JSONResponse courseByStudentId(@RequestParam Integer studentId) {
+        // 判断必要参数是否为空
+        if (studentId == null) {
+            return JSONResponseEnum.PARAMETER_MISSING_RESPONSE.getResponseValue();
+        }
+        ServiceResult serviceResult;
+        try {
+            // 获取学生选修的course集合
+            serviceResult = studentCourseService.getCourseListByStudentId(studentId);
+        } catch (Exception ex) {
+            // 捕获异常并返回失败状态
+            ex.printStackTrace();
+            return JSONResponseEnum.DATABASE_ERROR_RESPONSE.getResponseValue();
+        }
+        // 获取状态码
+        Integer resultCode = serviceResult.getCode();
+        // 判断状态码
+        if (resultCode.equals(CodeEnum.SUCCESS.getCode())) {
+            // 成功
+            // 获取course集合
+            List<Course> courses = ListUtil.castList(
+                    serviceResult.getData().get("courses"), Course.class);
+            // 返回响应
+            return JSONResponseEnum.SUCCESS_RESPONSE.getResponseValue().setData(courses);
+        } else if (resultCode.equals(CodeEnum.NULL_RESULT.getCode())) {
             return JSONResponseEnum.NULL_RESULT_RESPONSE.getResponseValue();
         }
         return JSONResponseEnum.OTHER_ERROR_RESPONSE.getResponseValue();

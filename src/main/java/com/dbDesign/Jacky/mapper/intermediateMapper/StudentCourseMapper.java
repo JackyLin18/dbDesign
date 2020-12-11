@@ -6,6 +6,7 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
 import org.springframework.stereotype.Repository;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @Repository
@@ -16,4 +17,8 @@ public interface StudentCourseMapper extends BaseMapper<StudentCourse> {
 
     @Select(value = "select course_id from student_course where student_id = #{studentId}")
     List<Integer> selectCourseIdListByStudentId(Integer studentId);
+
+    @Select(value = "SELECT SUM(credit) FROM course WHERE id IN ( " +
+            "  SELECT course_id FROM student_course WHERE student_id = #{studentId})")
+    Double selectCreditCountByStudentId(Integer studentId);
 }

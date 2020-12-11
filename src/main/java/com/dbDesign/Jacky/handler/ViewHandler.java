@@ -97,27 +97,48 @@ public class ViewHandler {
     }
 
     @RequestMapping("/courseSearch")
-    public String courseSearch(){
+    public String courseSearch() {
         return "courseSearch";
     }
 
     @RequestMapping("/courseDo")
-    public String courseDo(HttpServletRequest request){
+    public String courseDo(HttpServletRequest request) {
         Administrator administrator = (Administrator)
                 request.getSession().getAttribute("administrator");
-        if(administrator == null){
+        if (administrator == null) {
             return "login";
         }
         return "courseDo";
     }
 
     @RequestMapping("/courseMessage")
-    public String courseMessage(HttpServletRequest request){
+    public String courseMessage(HttpServletRequest request) {
         HttpSession session = request.getSession();
         Administrator administrator = (Administrator) session.getAttribute("administrator");
-        if(administrator == null){
+        Teacher teacher = (Teacher) session.getAttribute("teacher");
+        if (administrator == null && teacher == null) {
             return "login";
         }
         return "courseMessage";
+    }
+
+    @RequestMapping("/teacherCourse")
+    public String teacherCourse(HttpServletRequest request) {
+        HttpSession session = request.getSession();
+        Teacher teacher = (Teacher) session.getAttribute("teacher");
+        if (teacher == null) {
+            return "login";
+        }
+        return "teacherCourse";
+    }
+
+    @RequestMapping("/studentCourse")
+    public String studentCourse(HttpServletRequest request){
+        HttpSession session = request.getSession();
+        Student student = (Student) session.getAttribute("student");
+        if(student == null){
+            return "login";
+        }
+        return "studentCourse";
     }
 }

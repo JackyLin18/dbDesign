@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.List;
 
@@ -83,6 +84,40 @@ public class StudentCourseServiceImpl implements StudentCourseService {
             return ServiceResult.fail(CodeEnum.NULL_RESULT);
         }
         return ServiceResult.ok("students", students);
+    }
+
+    @Override
+    public ServiceResult chooseCourse(StudentCourse studentCourse) {
+        // 构建条件查询器
+        QueryWrapper<StudentCourse> wrapper = new QueryWrapper<>();
+        wrapper.eq("student_id", studentCourse.getStudentId());
+        wrapper.eq("course_id", studentCourse.getCourseId());
+        // 查询该学生是否已选择该课
+        StudentCourse sc = studentCourseMapper.selectOne(wrapper);
+        if (sc != null) {
+            return ServiceResult.fail(CodeEnum.OTHER_ERROR).setMessage("不可重复选课");
+        }
+        // 查询该student当前选课的学分数
+        Double nowCreditDouble = studentCourseMapper.selectCreditCountByStudentId(studentCourse.getStudentId());
+        if (nowCreditDouble == null) {
+            nowCreditDouble = 0.0;
+        }
+        BigDecimal nowCredit = BigDecimal.valueOf(nowCreditDouble);
+        // 查询该course的学分数
+        Course course = courseMapper.selectById(studentCourse.getCourseId());
+        BigDecimal credit = course.getCredit();
+        // 计算选课后的和
+        BigDecimal newCredit = nowCredit.add(credit);
+        // 判断是否超过15分
+        if (newCredit.doubleValue() > 15.0) {
+            return ServiceResult.fail(CodeEnum.OTHER_ERROR).setMessage("选课超过15学分");
+        } else {
+            int insert = studentCourseMapper.insert(studentCourse);
+            if (insert > 0) {
+                return ServiceResult.ok();
+            }
+        }
+        return ServiceResult.fail();
     }
 
     @Override

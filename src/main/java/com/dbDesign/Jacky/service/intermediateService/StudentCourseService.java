@@ -10,6 +10,8 @@ public interface StudentCourseService {
 
     ServiceResult getCourseListByStudentId(Integer studentId);
 
+    ServiceResult chooseCourse(StudentCourse studentCourse);
+
     ServiceResult remoteStudentCourse(Integer studentId, Integer courseId);
 
     ServiceResult remoteByStudentId(Integer studentId);

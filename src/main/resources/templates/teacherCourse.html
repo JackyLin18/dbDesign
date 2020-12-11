@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>我教授的课程</title>
+    <script type="text/javascript" src="/dbDesign/js/jquery-3.4.1.js"></script>
+    <script type="text/javascript" src="/dbDesign/js/DatePicker.js"></script>
+</head>
+<body>
+<label for="teacher_id"></label>
+<input hidden="hidden" id="teacher_id" th:value="${session.teacher.id}"/>
+<label for="teacher_name"></label>
+<input hidden="hidden" id="teacher_name" th:value="${session.teacher.name}"/>
+<button onclick="window.location.href='teacherMain'">返回首页</button>
+<table border="1">
+    <tbody id="courseBody"></tbody>
+</table>
+</body>
+
+<script type="text/javascript">
+    $(function () {
+        var teacher_id = $("#teacher_id").val();
+        $.ajax({
+            type: "GET",
+            url: "course/teacher?teacherId=" + teacher_id,
+            success: function (data) {
+                showCourses(data.data);
+            }
+        });
+    });
+</script>
+
+<script>
+    function showCourses(courseList) {
+        var teacher_name = $("#teacher_name").val();
+        var tableData = "<tr align='center'>" +
+            "<td width='50'>课程号</td>" +
+            "<td width='80'>课程名</td>" +
+            "<td width='60'>教师</td>" +
+            "<td width='50'>学时</td>" +
+            "<td width='50'>学分</td>" +
+            "<td width='200'>上课时间</td>" +
+            "<td width='80'>上课地点</td>" +
+            "<td width='160'>考试时间</td>" +
+            "<td width='80'>修改</td>" +
+            "</tr>";
+        for (var i = 0; i < courseList.length; i++) {
+            tableData += "<tr align='center'>";
+            tableData += "<td>" + courseList[i].id + "</td>";
+            tableData += "<td>" + courseList[i].name + "</td>";
+            tableData += "<td>" + teacher_name + "</td>";
+            tableData += "<td>" + courseList[i].courseHours + "</td>";
+            tableData += "<td>" + courseList[i].credit + "</td>";
+            tableData += "<td>" + courseList[i].classTime + "</td>";
+            tableData += "<td>" + courseList[i].classAddress + "</td>";
+            tableData += "<td>" + getLocalTime(courseList[i].examTime) + "</td>";
+            tableData += "<td>" + "<button onclick='courseMessage(" + courseList[i].id + ")'>进入修改</button>" + "</td>";
+            tableData += "</tr>";
+        }
+        $("#courseBody").html(tableData);
+    }
+
+    function getLocalTime(timeStamp) {
+        var dataee = new Date(timeStamp).toJSON();
+        return new Date(+new Date(dataee)).toLocaleString().replace(/:\d{1,2}$/, ' ');
+    }
+
+    function courseMessage(courseId) {
+        $.ajax({
+            type: "GET",
+            url: "course?id=" + courseId,
+            success: function () {
+                window.location.href = "courseMessage";
+            }
+        })
+    }
+</script>
+</html>

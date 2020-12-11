@@ -6,6 +6,7 @@
     <script type="text/javascript" src="/dbDesign/js/jquery-3.4.1.js"></script>
 </head>
 <body>
+<label for="student_id"></label><input id="student_id" hidden="hidden" th:value="${session.student.id}"/>
 <h3>搜索条件</h3>
 课&nbsp;&nbsp;程&nbsp;&nbsp;号：&nbsp;<label for="id"></label><input id="id"/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 课&nbsp;&nbsp;程&nbsp;&nbsp;名：<label for="name"></label><input id="name"/><br/>
@@ -78,6 +79,7 @@
     }
 
     var teachers;
+
     function showCourses(courseList) {
         var tableData = "<tr align='center'>" +
             "<td width='50'>课程号</td>" +
@@ -88,6 +90,7 @@
             "<td width='200'>上课时间</td>" +
             "<td width='80'>上课地点</td>" +
             "<td width='160'>考试时间</td>" +
+            ($("#role").val() === 'student' ? '<td width="60">选课</td>' : '') +
             "</tr>";
         for (var i = 0; i < courseList.length; i++) {
             tableData += "<tr align='center'>";
@@ -99,9 +102,35 @@
             tableData += "<td>" + courseList[i].classTime + "</td>";
             tableData += "<td>" + courseList[i].classAddress + "</td>";
             tableData += "<td>" + getLocalTime(courseList[i].examTime) + "</td>";
+            if ($("#role").val() === 'student') {
+                tableData += "<td>" + "<button style='color: green' onclick='chooseCourse(" + courseList[i].id + ")'>选课</button>" + "</td>";
+            }
             tableData += "</tr>";
         }
         $("#courseBody").html(tableData);
+    }
+
+    function chooseCourse(course_id) {
+        var student_id = $("#student_id").val();
+        var param = {
+            "student_id": student_id,
+            "course_id": course_id
+        };
+
+        $.ajax({
+            type: "POST",
+            url: 'studentCourse/choose',
+            data: {params: JSON.stringify(param)},
+            datatype: "json",
+            success: function (data) {
+                console.log(data);
+                if (data.status == true) {
+                    alert("成功选课 " + "(课程号为" + course_id + ")");
+                } else {
+                    alert("选课失败，原因：" + data.message);
+                }
+            }
+        });
     }
 
     function getLocalTime(timeStamp) {
