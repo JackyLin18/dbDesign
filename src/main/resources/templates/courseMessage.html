@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <script type="text/javascript" src="/dbDesign/js/jquery-3.4.1.js"></script>
+    <title th:text="'课程'+${session.course.name}+'的信息'"></title>
+</head>
+<body>
+课&nbsp;&nbsp;程&nbsp;&nbsp;号：&nbsp;<label for="id"></label><input readonly="readonly" id="id"
+                                                                 th:value="${session.course.id}"/><br/>
+课&nbsp;&nbsp;程&nbsp;&nbsp;名：<label>
+    <input type="text" th:value="${session.course.name}" id="name">
+</label>
+&nbsp;&nbsp;
+教师工号：&nbsp;<label for="teacher_id"></label><input th:value="${session.course.teacherId}" id="teacher_id">
+<br/>
+学&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;时：&nbsp;<label for="course_hours"></label><input
+        th:value="${session.course.courseHours}" type="number" id="course_hours"/>
+&nbsp;&nbsp;
+学&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;分：&nbsp;<label for="credit"></label><input
+        th:value="${session.course.credit}" type="number" min="0.0" max="5.0" step="0.5" id="credit"/><br/>
+上课时间：&nbsp;<label for="class_time"></label><input th:value="${session.course.classTime}" id="class_time"
+                                                  style="width: 400px"/><br/>
+上课地点：&nbsp;<label for="class_address"></label><input th:value="${session.course.classAddress}" id="class_address"
+                                                     style="width: 400px"/><br/>
+考试时间：&nbsp;<label for="exam_date"></label><input th:value="${session.course.getExamTimeDate()}" id="exam_date"
+                                                 type="date"/>
+<label for="exam_time"></label><input id="exam_time" type="time"
+                                      th:value="${session.course.getExamTimeDateTime()}"/><br/>
+
+<input type="button" value="修改" onclick="updateCourse()">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<input type="button" onclick="window.location.href='administratorMain'" value="返回主页">
+
+<script type="text/javascript">
+    $(function () {
+        var exam_time_element = $("#exam_time");
+        var exam_time = exam_time_element.val();
+        exam_time = exam_time.substr(0, 5);
+        exam_time_element.val(exam_time);
+    });
+
+    function updateCourse() {
+        var id = $("#id").val();
+        var name = $("#name").val();
+        var teacher_id = $("#teacher_id").val();
+        var course_hours = $("#course_hours").val();
+        var credit = $("#credit").val();
+        var class_time = $("#class_time").val();
+        var class_address = $("#class_address").val();
+        var exam_date = document.getElementById("exam_date").value;
+        var exam_time = document.getElementById("exam_time").value;
+        exam_time = exam_date + " " + exam_time;
+
+        var param = {
+            "id": id, "name": name,
+            "teacher_id": teacher_id,
+            "course_hours": course_hours,
+            "credit": credit, "class_time": class_time,
+            "class_address": class_address, "exam_time": exam_time
+        };
+
+        $.ajax({
+            type: "PUT",
+            url: 'course',
+            data: {params: JSON.stringify(param)},
+            datatype: "json",
+            success: function (data) {
+                console.log(data);
+                window.location.href = "courseDo";
+            }
+        });
+    }
+</script>
+</body>
+</html>

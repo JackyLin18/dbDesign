@@ -1,0 +1,128 @@
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>聊天室</title>
+    <script type="text/javascript">
+        var ws;
+
+        function login() {
+            if (!ws) {
+                var fromUserId = document.getElementById("fromUserId").value;
+                try {
+                    // ws = new WebSocket("ws://localhost:8080/sportsPlatform/system/sendMessage");//连接服务器
+                    ws = new WebSocket("ws://localhost:8080/sportsPlatform/chat/"+ fromUserId);
+                    ws.onopen = function (event) {
+                        console.log("已经与服务器建立了连接...");
+                        alert("登陆成功，可以开始聊天了")
+                    };
+                    ws.onmessage = function (event) {
+                        var jsonObject = JSON.parse(event.data);
+                        var baseTime = jsonObject.data.sendTime;
+                        var date = new Date(baseTime);
+                        var showTime = date.getFullYear() + '年' + (date.getMonth() + 1) + '月'
+                            + date.getDate() + '日 ' + date.getHours() + ':' + date.getMinutes()
+                            + ':' + date.getSeconds();
+                        if (typeof (jsonObject.data.content) == "string") {
+                            console.log("接收到服务器发送的文字数据..." + event.data);
+                            document.getElementById("info").innerHTML +=
+                                showTime + "<br/>" + jsonObject.data.fromUserId
+                                + ":" + jsonObject.data.content + "<br/>";
+                        } else {
+                            console.log("接收到服务器发送的文件数据...");
+                            console.log(jsonObject.data.imageUrl);
+                            console.log(jsonObject.data.compressedBase64);
+                            var showPhoto = "<img width='200' src=" + "'" + jsonObject.data.compressedUrl + "'/>";
+                            var realPhoto = "<img width='200' src=" + "'" + jsonObject.data.imageUrl +"'/>";
+                            document.getElementById("info").innerHTML +=
+                                showTime + "<br/>" + jsonObject.data.fromUserId
+                                + ":" + showPhoto + "<br/>" + realPhoto + "<br/>";
+                        }
+                    };
+                    ws.onclose = function (event) {
+                        console.log("已经与服务器断开连接...");
+                    };
+                    ws.onerror = function (event) {
+                        console.log("WebSocket异常！");
+                    };
+                } catch (ex) {
+                    alert(ex.message);
+                }
+                document.getElementById("login").innerHTML = "退出";
+            } else {
+                ws.close();
+                ws = null;
+            }
+        }
+
+        function SendData() {
+            var data = document.getElementById("data").value;
+            var toUserId = document.getElementById("toUserId").value;
+            if (toUserId === "" || toUserId === null) {
+                toUserId = "";
+            }
+            var messageObject = {
+                content: data,
+                toUserId: toUserId
+            };
+            var messageJson = JSON.stringify(messageObject);
+            try {
+                ws.send(messageJson);
+            } catch (ex) {
+                alert(ex.message);
+            }
+        }
+
+        function sendFile() {
+            var toUserId = document.getElementById("toUserId").value;
+            var reader = new FileReader();
+            var AllowImgFileSize = 4200000 * 1024 * 1024;
+            var file = document.querySelector("input[id='fileSelect']").files[0];
+            var imgUrlBase64;
+            if (file) {
+                //将文件以Data URL形式读入页面
+                imgUrlBase64 = reader.readAsDataURL(file);
+                console.log(imgUrlBase64);
+                reader.onload = function (e) {
+                    if (AllowImgFileSize !== 0 && AllowImgFileSize < reader.result.length) {
+                        alert('上传失败，请上传不大于4M的图片！');
+                    } else {
+                        //执行上传操作
+                        var fileObject = {
+                            file: reader.result,
+                            toUserId: toUserId
+                        };
+                        console.log(reader.result);
+                        var fileJson = JSON.stringify(fileObject);
+                        try {
+                            ws.send(fileJson);
+                        } catch (ex) {
+                            alert(ex.message);
+                        }
+                    }
+                }
+            }
+
+            function sendPhoto() {
+                context.get
+            }
+        }
+    </script>
+</head>
+<body>
+<input id="fromUserId" value="" placeholder="用户名">
+<button id="login" type="button" onclick="login()" value="">登陆</button>
+<br/><br/>
+<input id="data">
+<button type="button" onclick='SendData();'>发送消息</button>
+<br/>
+<input type="file" id="fileSelect"/><br/>
+<button type="button" onclick="sendFile()">发送文件</button>
+<br/>
+发送给：<input id="toUserId" value="" placeholder="目标人物"/>
+<br/>
+<div id="info">
+
+</div>
+<br/>
+</body>
+</html>

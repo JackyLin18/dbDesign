@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>注册学生</title>
+    <script type="text/javascript" src="/dbDesign/js/jquery-3.4.1.js"></script>
+    <script type="text/javascript" src="/dbDesign/js/DatePicker.js"></script>
+</head>
+<body>
+姓&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;名：<label for="name"></label><input type="text" id="name"/><br/>
+性&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;别：
+<label><input type="radio" name="sex" value="1">男</label>
+<label><input type="radio" name="sex" value="2">女</label><br/>
+出生年月：<label for="birthday"></label><input id="birthday" onclick="setmonth(this)"/><br/>
+学&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;院：
+<select id="department"></select><br/>
+职&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;称：<label for="title"></label><input type="text" id="title"><br/>
+专&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;业：<label for="major"></label><input type="text" id="major"/><br/>
+教学方向：<label for="teaching_direction"></label>
+<textarea rows="8" maxlength="50" id="teaching_direction" placeholder="50字以内"></textarea><br/>
+密&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;码：<label for="password"></label><input type="password"
+                                                                                        id="password"/><br/>
+重复密码：<label for="rePassword"></label><input type="password" id="rePassword"/><br/>
+<input type="button" value="注册" onclick="registerStudent()">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<a href="login">返回登录页面</a>
+<script type="text/javascript">
+    var departments;
+    $(function () {
+        $.ajax({
+            type: "GET",
+            url: 'department/all',
+            data: {},
+            success: function (data) {
+                departments = data.data;
+                var optionString = "";
+                for (var i = 0; i < departments.length; i++) {
+                    var department = departments[i];
+                    optionString += "<option value=\"" + department.id + "\">" + department.name + "</option>";
+                    $("#department").html("<option value=''>请选择...</option>" + optionString);
+                }
+            }
+        });
+    })
+</script>
+
+<script type="text/javascript">
+    function registerStudent() {
+        var password = document.getElementById("password").value;
+        var rePassword = document.getElementById("rePassword").value;
+        if (password !== rePassword) {
+            alert("重复密码不正确");
+            return;
+        }
+        if(password == null){
+            alert("密码不能为空");
+            return;
+        }
+
+        var name = document.getElementById("name").value;
+        var sexRadio = document.getElementsByName("sex");
+        var sex;
+        for (var i = 0; i < sexRadio.length; i++) {
+            if (sexRadio[i].checked) {
+                sex = sexRadio[i].value;
+            }
+        }
+        var birthday = document.getElementById("birthday").value;
+        var department = document.getElementById("department").value;
+        var title = document.getElementById("title").value;
+        var major = document.getElementById("major").value;
+        var teaching_direction = document.getElementById("teaching_direction").value;
+
+        // 注册教师
+        var param = {
+            "password": password, "name": name, "sex": sex,
+            "birthday": birthday, "department_id": department,
+            "title": title, "major": major,
+            "teaching_direction": teaching_direction
+        };
+        $.ajax({
+            type: "POST",
+            url: 'teacher',
+            data: {params: JSON.stringify(param)},
+            datatype: "json",
+            success: function (data) {
+                console.log(data);
+                alert("获得的教职工号为：" + data.data);
+                window.location.href = "login";
+            }
+        });
+    }
+</script>
+</body>
+</html>

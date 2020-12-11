@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>教师主页</title>
+    <script type="text/javascript" src="/dbDesign/js/jquery-3.4.1.js"></script>
+</head>
+<body>
+<h1>欢迎你，教师&nbsp;&nbsp;<span th:text="${session.teacher.name}"></span>&nbsp;&nbsp;进入系统</h1>
+<h3>你可以进行以下操作：</h3>
+<button onclick="ownMessage()">个人信息</button>
+<br/>
+<button onclick="studentSearch()">学生查询</button>
+<br/>
+<button onclick="window.location.href='teacherSearch'">教师查询</button><br/>
+<button onclick="window.location.href='courseSearch'">课程查询</button><br/>
+<button>查看个人授课</button>
+<br/>
+<button onclick="logout()" style="color: red">退出登录</button>
+<script type="text/javascript">
+    function ownMessage() {
+        document.location.href = "teacherOwnMessage";
+    }
+
+    function studentSearch() {
+        document.location.href = "studentSearch";
+    }
+
+    function logout(){
+        $.ajax({
+            type: "GET",
+            url: 'login/out',
+            success: function () {
+                window.location.href = "login";
+            }
+        });
+    }
+
+    $(function () {
+        history.pushState(null, null, document.URL);
+        window.addEventListener('popstate', function (e) {
+            history.pushState(null, null, document.URL);
+        })
+    });
+</script>
+</body>
+</html>

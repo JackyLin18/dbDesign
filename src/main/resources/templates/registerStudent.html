@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>注册学生</title>
+    <script type="text/javascript" src="/dbDesign/js/jquery-3.4.1.js"></script>
+</head>
+<body>
+姓&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;名：<label for="name"></label><input type="text" id="name"/><br/>
+性&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;别：
+<label><input type="radio" name="sex" value="1">男</label>
+<label><input type="radio" name="sex" value="2">女</label><br/>
+出生日期：<label for="birthday"></label><input type="date" id="birthday"/><br/>
+入学成绩：<label for="enrolled_score"></label><input type="number" id="enrolled_score"/><br/>
+学&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;院：
+<select id="department"></select><br/>
+密&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;码：<label for="password"></label><input type="password"
+                                                                                        id="password"/><br/>
+重复密码：<label for="rePassword"></label><input type="password" id="rePassword"/><br/>
+<input type="button" value="注册" onclick="registerStudent()">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<a href="login">返回登录页面</a>
+<script type="text/javascript">
+    var departments;
+    $(function () {
+        $.ajax({
+            type: "GET",
+            url: 'department/all',
+            data: {},
+            success: function (data) {
+                departments = data.data;
+                var optionString = "";
+                for (var i = 0; i < departments.length; i++) {
+                    var department = departments[i];
+                    optionString += "<option value=\"" + department.id + "\">" + department.name + "</option>";
+                    $("#department").html("<option value=''>请选择...</option>" + optionString);
+                }
+            }
+        });
+    })
+</script>
+
+<script type="text/javascript">
+    function registerStudent() {
+        var password = document.getElementById("password").value;
+        var rePassword = document.getElementById("rePassword").value;
+        if (password !== rePassword) {
+            alert("重复密码不正确");
+            return;
+        }
+
+        var name = document.getElementById("name").value;
+        var sexRadio = document.getElementsByName("sex");
+        var sex;
+        for (var i = 0; i < sexRadio.length; i++) {
+            if (sexRadio[i].checked) {
+                sex = sexRadio[i].value;
+            }
+        }
+        var birthday = document.getElementById("birthday").value;
+        var enrolled_score = document.getElementById("enrolled_score").value;
+        var department = document.getElementById("department").value;
+
+        // 注册学生
+        var param = {
+            "password": password, "name": name, "sex": sex,
+            "birthday": birthday, "enrolled_score": enrolled_score,
+            "department_id": department
+        };
+        $.ajax({
+            type: "POST",
+            url: 'student',
+            data: {params: JSON.stringify(param)},
+            datatype: "json",
+            success: function (data) {
+                console.log(data);
+                alert("获得的学号为：" + data.data);
+                window.location.href = "login";
+            }
+        });
+    }
+</script>
+</body>
+</html>

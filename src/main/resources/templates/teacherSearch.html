@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>搜索教师信息</title>
+    <script type="text/javascript" src="/dbDesign/js/jquery-3.4.1.js"></script>
+</head>
+<body>
+<h3>搜索条件</h3>
+教职工号：<label for="id"></label><input id="id"/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+姓&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;名：<label for="name"></label><input id="name"/><br/>
+学&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;院：<label for="department"></label><select
+        id="department"></select><br/>
+职&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;称：<label for="title"></label><input id="title"/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+专&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;业：<input id="major"/><br/>
+<input type="button" onclick="studentSearch()" value="搜索"/>
+<input hidden="hidden" id="role"
+       th:value="${session.teacher} != null ? 'teacher' : (${session.administrator} == null ? 'student' : 'administrator')"/>
+<input type="button"
+       onclick="window.location.href = (document.getElementById('role').value == 'teacher' ? 'teacherMain'
+       : (document.getElementById('role').value == 'administrator' ? 'administratorMain' :
+        'studentMain'))"
+       value="返回主页">
+<br/>
+<table border="1">
+    <tbody id="teachersBody">
+    </tbody>
+</table>
+<script type="text/javascript">
+    var departments;
+    $(function () {
+        $.ajax({
+            type: "GET",
+            url: 'department/all',
+            data: {},
+            success: function (data) {
+                departments = data.data;
+                var optionString = "";
+                for (var i = 0; i < departments.length; i++) {
+                    var department = departments[i];
+                    optionString += "<option value=\"" + department.id + "\">" + department.name + "</option>";
+                    $("#department").html("<option value=''>请选择...</option>" + optionString);
+                }
+            }
+        });
+    })
+</script>
+
+<script type="text/javascript">
+    function studentSearch() {
+        $("#teachersBody").html("");
+        var id = document.getElementById("id").value;
+        var name = document.getElementById("name").value;
+        var department = document.getElementById("department").value;
+        var title = document.getElementById("title").value;
+        var major = document.getElementById("major").value;
+
+        // 搜索教师
+        var param = {
+            "id": id, "name": name,
+            "title": title, "major": major,
+            "department_id": department
+        };
+        $.ajax({
+            type: "GET",
+            url: 'teacher/option',
+            data: {optionParams: JSON.stringify(param)},
+            datatype: "json",
+            success: function (data) {
+                console.log(data);
+                showTeacherList(data.data);
+            }
+        });
+    }
+
+    function showTeacherList(teacherList) {
+        var tableData = "<tr align='center'>" +
+            "<td width='80'>教职工号</td>" +
+            "<td width='60'>姓名</td>" +
+            "<td width='60'>性别</td>" +
+            "<td width='100'>出生年月</td>" +
+            "<td width='100'>学院</td>" +
+            "<td width='80'>职称</td>" +
+            "<td width='120'>专业</td>" +
+            "<td width='500'>教学方向</td>" +
+            "</tr>";
+        for (var i = 0; i < teacherList.length; i++) {
+            tableData += "<tr align='center'>";
+            tableData += "<td>" + teacherList[i].id + "</td>";
+            tableData += "<td>" + teacherList[i].name + "</td>";
+            tableData += "<td>" + (teacherList[i].sex == 0 ? '未知' : (teacherList[i].sex == 1 ? '男' : '女')) + "</td>";
+            tableData += "<td>" + teacherList[i].birthday.slice(0, 7) + "</td>";
+            tableData += "<td>" + getDepartmentName(teacherList[i].departmentId) + "</td>";
+            tableData += "<td>" + teacherList[i].title + "</td>";
+            tableData += "<td>" + teacherList[i].major + "</td>";
+            tableData += "<td align='left'>" + teacherList[i].teachingDirection + "</td>";
+            tableData += "</tr>";
+        }
+        $("#teachersBody").html(tableData);
+    }
+</script>
+
+<script>
+    $(function () {
+        $.ajax({
+            type: "GET",
+            url: 'department/all',
+            data: {},
+            success: function (data) {
+                departments = data.data;
+            }
+        });
+    });
+
+    function getDepartmentName(departmentId) {
+        for (var i = 0; i < departments.length; i++) {
+            if (departments[i].id == departmentId) {
+                return departments[i].name;
+            }
+        }
+    }
+</script>
+</body>
+</html>

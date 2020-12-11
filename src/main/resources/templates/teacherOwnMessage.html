@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <script type="text/javascript" src="/dbDesign/js/jquery-3.4.1.js"></script>
+    <script type="text/javascript" src="/dbDesign/js/DatePicker.js"></script>
+    <title th:text="'教师'+${session.teacher.name}+'的信息'"></title>
+</head>
+<body>
+教职工号：&nbsp;<label for="id"></label><input readonly="readonly" id="id" th:value="${session.teacher.id}"/><br/>
+姓&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;名：<label>
+    <input type="text" th:value="${session.teacher.name}" id="name">
+</label><br/>
+性&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;别：<label>
+    <input type="radio" name="sex" th:checked="${session.teacher.sex == 1} ? true : false" value="1">
+</label>男
+<label><input type="radio" name="sex" th:checked="${session.teacher.sex == 2} ? true : false" value="2">
+</label>女<br/>
+出生年月：<label>
+    <input id="birthday" onclick="setmonth(this)"
+           th:value="${session.teacher.birthday.year+1900}+'-'+(${session.teacher.birthday.month}<9?'0'+${session.teacher.birthday.month+1}:${session.teacher.birthday.month+1})">
+</label><br/>
+学&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;院：&nbsp;<label for="department"></label><select id="department">
+</select><br/>
+职&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;称：<label for="title"></label><input id="title" th:value="${session.teacher.title}"><br/>
+专&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;业：<label for="major"></label><input id="major" th:value="${session.teacher.major}"><br/>
+教学方向：<label for="teaching_direction"></label>
+<textarea rows="8" maxlength="50" id="teaching_direction" placeholder="50字以内" th:text="${session.teacher.teachingDirection}"></textarea><br/>
+密&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;码：&nbsp;<label for="password"></label><input type="password" id="password"/><br/>
+重复密码：&nbsp;<label for="rePassword"></label><input type="password" id="rePassword"/><br/>
+<input type="button" value="修改" onclick="updateTeacher()">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<input type="button" onclick="window.location.href='teacherMain'" value="返回主页">
+
+<script type="text/javascript">
+    var departments;
+    $(function () {
+        $.ajax({
+            type: "GET",
+            url: 'department/all',
+            success: function (data) {
+                departments = data.data;
+                var optionString = "";
+                for (var i = 0; i < departments.length; i++) {
+                    var department = departments[i];
+                    optionString += "<option value=\"" + department.id + "\">" + department.name + "</option>";
+                    $("#department").html("<option value=''>请选择...</option>" + optionString);
+                }
+                selectDepartment();
+            }
+        });
+    })
+</script>
+
+<script th:inline="javascript" type="text/javascript">
+    function selectDepartment() {
+        /*<![CDATA[*/
+        var departmentId = /*[[${session.teacher.departmentId}]]*/ 'Sebastian';
+        /*]]>*/
+        var departments = document.getElementById("department");
+        for (var i = 0; i < departments.length; i++) {
+            if (departments.options[i].value == departmentId) {
+                $(departments[i]).prop("selected", "selected");
+            }
+        }
+    }
+</script>
+
+<script type="text/javascript">
+    function updateTeacher() {
+        var password = document.getElementById("password").value;
+        var rePassword = document.getElementById("rePassword").value;
+        if (password !== rePassword) {
+            alert("重复密码不正确");
+            return;
+        }
+        if (password === "") {
+            password = null;
+        }
+
+        var id = document.getElementById("id").value;
+        var name = document.getElementById("name").value;
+        var sexRadio = document.getElementsByName("sex");
+        var sex;
+        for (var i = 0; i < sexRadio.length; i++) {
+            if (sexRadio[i].checked) {
+                sex = sexRadio[i].value;
+            }
+        }
+        var birthday = document.getElementById("birthday").value;
+        var department = document.getElementById("department").value;
+        var title = document.getElementById("title").value;
+        var major = document.getElementById("major").value;
+        var teaching_direction = document.getElementById("teaching_direction").value;
+
+        // 修改teacher
+        var param = {
+            "password": password, "name": name, "sex": sex,
+            "birthday": birthday, "department_id": department,
+            "id": id, "title": title, "major": major,
+            "teaching_direction": teaching_direction
+        };
+        $.ajax({
+            type: "PUT",
+            url: 'teacher',
+            data: {params: JSON.stringify(param)},
+            datatype: "json",
+            success: function (data) {
+                console.log(data);
+                window.location.href = "teacherMain";
+            }
+        });
+    }
+</script>
+</body>
+</html>

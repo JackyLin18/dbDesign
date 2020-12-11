@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>课程管理</title>
+    <script type="text/javascript" src="/dbDesign/js/jquery-3.4.1.js"></script>
+    <script type="text/javascript" src="/dbDesign/js/DatePicker.js"></script>
+</head>
+<body>
+课&nbsp;&nbsp;程&nbsp;&nbsp;名：<label for="course_name"></label><input id="course_name"/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+教师工号：<label for="course_teacher"></label><input id="course_teacher"><br/>
+学&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;时：<label for="course_hours"></label><input type="number"
+                                                                                            id="course_hours"/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+学&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;分：<label for="credit"></label><input type="number" min="0.0" max="5.0"
+                                                                                      step="0.5" id="credit"/><br/>
+上课时间：<label for="class_time"></label><input id="class_time" style="width: 400px"/><br/>
+上课地点：<label for="class_address"></label><input id="class_address" style="width: 400px"/><br/>
+考试时间：<label for="exam_date"></label><input id="exam_date" type="date"/>
+<label for="exam_time"></label><input id="exam_time" type="time"/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<button type="button" onclick="addCourse()">添加课程</button>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<button onclick="window.location.href='administratorMain'">返回首页</button>
+<table border="1">
+    <tbody id="courseBody"></tbody>
+</table>
+</body>
+
+<script type="text/javascript">
+    $(function () {
+        $.ajax({
+            type: "GET",
+            url: "teacher/all",
+            success: function (data) {
+                teachers = data.data;
+                $.ajax({
+                    type: "GET",
+                    url: "course/all",
+                    success: function (data) {
+                        showCourses(data.data);
+                    }
+                });
+            }
+        });
+    });
+
+    function addCourse() {
+        var name = document.getElementById("course_name").value;
+        var teacher_id = document.getElementById("course_teacher").value;
+        var course_hours = document.getElementById("course_hours").value;
+        var credit = document.getElementById("credit").value;
+        var class_time = document.getElementById("class_time").value;
+        var class_address = document.getElementById("class_address").value;
+        var exam_date = document.getElementById("exam_date").value;
+        var exam_time = document.getElementById("exam_time").value;
+        exam_time = exam_date + " " + exam_time;
+
+        var param = {
+            "name": name, "teacher_id": teacher_id,
+            "course_hours": course_hours,
+            "credit": credit,
+            "class_time": class_time,
+            "class_address": class_address,
+            "exam_time": exam_time
+        };
+
+        $.ajax({
+            type: "POST",
+            url: 'course',
+            data: {params: JSON.stringify(param)},
+            datatype: "json",
+            success: function (data) {
+                $.ajax({
+                    type: "GET",
+                    url: "course/all",
+                    success: function (data) {
+                        showCourses(data.data);
+                    }
+                })
+            }
+        });
+    }
+</script>
+
+<script>
+    var teachers;
+
+    function showCourses(courseList) {
+        var tableData = "<tr align='center'>" +
+            "<td width='50'>课程号</td>" +
+            "<td width='80'>课程名</td>" +
+            "<td width='60'>教师</td>" +
+            "<td width='50'>学时</td>" +
+            "<td width='50'>学分</td>" +
+            "<td width='200'>上课时间</td>" +
+            "<td width='80'>上课地点</td>" +
+            "<td width='160'>考试时间</td>" +
+            "<td width='80'>修改</td>" +
+            "</tr>";
+        for (var i = 0; i < courseList.length; i++) {
+            tableData += "<tr align='center'>";
+            tableData += "<td>" + courseList[i].id + "</td>";
+            tableData += "<td>" + courseList[i].name + "</td>";
+            tableData += "<td>" + getTeacherName(courseList[i].teacherId) + "</td>";
+            tableData += "<td>" + courseList[i].courseHours + "</td>";
+            tableData += "<td>" + courseList[i].credit + "</td>";
+            tableData += "<td>" + courseList[i].classTime + "</td>";
+            tableData += "<td>" + courseList[i].classAddress + "</td>";
+            tableData += "<td>" + getLocalTime(courseList[i].examTime) + "</td>";
+            tableData += "<td>" + "<button onclick='courseMessage(" + courseList[i].id + ")'>进入修改</button>" + "</td>";
+            tableData += "</tr>";
+        }
+        $("#courseBody").html(tableData);
+    }
+
+
+    function getLocalTime(timeStamp) {
+        var dataee = new Date(timeStamp).toJSON();
+        return new Date(+new Date(dataee)).toLocaleString().replace(/:\d{1,2}$/, ' ');
+    }
+
+    function getTeacherName(teacherId) {
+        for (var i = 0; i < teachers.length; i++) {
+            if (teachers[i].id == teacherId) {
+                return teachers[i].name;
+            }
+        }
+    }
+
+    function courseMessage(courseId) {
+        $.ajax({
+            type: "GET",
+            url: "course?id=" + courseId,
+            success: function () {
+                window.location.href = "courseMessage";
+            }
+        })
+    }
+</script>
+</html>
