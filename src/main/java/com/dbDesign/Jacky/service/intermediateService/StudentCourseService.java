@@ -4,15 +4,19 @@ import com.dbDesign.Jacky.model.entity.intermediate.StudentCourse;
 import com.dbDesign.Jacky.model.vo.ServiceResult;
 
 public interface StudentCourseService {
-    ServiceResult saveStudentCourse(StudentCourse studentCourse);
-
-    ServiceResult getStudentListByCourseId(Integer courseId);
-
     ServiceResult getCourseListByStudentId(Integer studentId);
 
     ServiceResult chooseCourse(StudentCourse studentCourse);
 
+    ServiceResult saveGrade(StudentCourse studentCourse);
+
     ServiceResult remoteStudentCourse(Integer studentId, Integer courseId);
+
+    ServiceResult getGrade(Integer studentId,Integer courseId);
+
+    ServiceResult getGradesByCourseId(Integer courseId);
+
+    ServiceResult getGradesByStudentId(Integer studentId);
 
     ServiceResult remoteByStudentId(Integer studentId);
 

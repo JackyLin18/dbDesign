@@ -6,7 +6,7 @@
     <script type="text/javascript" src="/dbDesign/js/jquery-3.4.1.js"></script>
 </head>
 <body>
-<label for="student_id"></label><input id="student_id" hidden="hidden" th:value="${session.student.id}"/>
+<label for="student_id"></label><input id="student_id" hidden="hidden" th:value="${session.student==null?'':session.student.id}"/>
 <h3>搜索条件</h3>
 课&nbsp;&nbsp;程&nbsp;&nbsp;号：&nbsp;<label for="id"></label><input id="id"/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 课&nbsp;&nbsp;程&nbsp;&nbsp;名：<label for="name"></label><input id="name"/><br/>

@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>选课学生信息</title>
+    <script type="text/javascript" src="/dbDesign/js/jquery-3.4.1.js"></script>
+</head>
+<body>
+<input hidden="hidden" id="course_id" th:value="${#request.getAttribute('courseId')}"/>
+<input hidden="hidden" id="role" th:value="${session.teacher} != null ? 'teacher' : 'admin'"/>
+<input type="button" value="返回上一个页面" onclick="javascript:window.history.back(-1);">
+<br/>
+<table border="1">
+    <tbody id="studentsBody">
+    </tbody>
+</table>
+<button onclick="saveScore()">保存成绩</button>
+<script type="text/javascript">
+    var departments;
+    var studentList;
+    $(function () {
+        $.ajax({
+            type: "GET",
+            url: 'department/all',
+            data: {},
+            success: function (data) {
+                departments = data.data;
+                $.ajax({
+                    type: "GET",
+                    url: "student/course?courseId=" + $("#course_id").val(),
+                    success: function (data) {
+                        studentList = data.data;
+                        showStudentList(studentList);
+                        var course_id = $("#course_id").val();
+                        $.ajax({
+                            type: "GET",
+                            url: "studentCourse/grades/course?courseId=" + course_id,
+                            success: function (data) {
+                                var studentCourses = data.data;
+                                showGrade(studentCourses);
+                            }
+                        })
+                    }
+                })
+            }
+        });
+    })
+</script>
+
+<script type="text/javascript">
+    var studentListLength;
+
+    function showStudentList(studentList) {
+        studentListLength = studentList.length;
+        var tableData = "<tr align='center'>" +
+            "<td width='60'>学号</td>" +
+            "<td width='60'>姓名</td>" +
+            "<td width='60'>性别</td>" +
+            "<td width='100'>出生日期</td>" +
+            "<td width='80'>入学成绩</td>" +
+            "<td width='100'>学院</td>" +
+            "<td width='80'>科目成绩</td>" +
+            "</tr>";
+        for (var i = 0; i < studentList.length; i++) {
+            tableData += "<tr align='center'>";
+            tableData += "<td>" + studentList[i].id + "</td>";
+            tableData += "<td>" + studentList[i].name + "</td>";
+            tableData += "<td>" + (studentList[i].sex == 0 ? '未知' : (studentList[i].sex == 1 ? '男' : '女')) + "</td>";
+            tableData += "<td>" + studentList[i].birthday + "</td>";
+            tableData += "<td>" + studentList[i].enrolledScore + "分" + "</td>";
+            tableData += "<td>" + getDepartmentName(studentList[i].departmentId) + "</td>";
+            tableData += "<td>" + "<input style='width: 80px' id='" + "student" + studentList[i].id + "'/>" + "</td>";
+            tableData += "</tr>";
+        }
+        $("#studentsBody").html(tableData);
+    }
+</script>
+
+<script>
+    $(function () {
+        $.ajax({
+            type: "GET",
+            url: 'department/all',
+            data: {},
+            success: function (data) {
+                departments = data.data;
+            }
+        });
+    });
+
+    function getDepartmentName(departmentId) {
+        for (var i = 0; i < departments.length; i++) {
+            if (departments[i].id == departmentId) {
+                return departments[i].name;
+            }
+        }
+    }
+
+    function showGrade(studentCourses) {
+        for (var i = 0; i < studentList.length; i++) {
+            var grade = $(("#student" + studentList[i].id));
+            for (var j = 0; j < studentCourses.length; j++) {
+                if (studentList[i].id == studentCourses[j].studentId) {
+                    grade.val(studentCourses[j].grade);
+                    break;
+                }
+            }
+        }
+    }
+
+    function saveScore() {
+        var flag = true;
+        for (var i = 0; i < studentList.length; i++) {
+            var grade = $(("#student" + studentList[i].id)).val();
+            if(grade == ""){
+                grade = 0;
+            }
+            if(grade<0){
+                grade=0;
+            }
+            if(grade>100){
+                grade=100;
+            }
+            var course_id = $("#course_id").val();
+            var param = {
+                "student_id": studentList[i].id,
+                "course_id": course_id,
+                "grade": grade
+            };
+            $.ajax({
+                type: "POST",
+                url: 'studentCourse/grade',
+                data: {params: JSON.stringify(param)},
+                datatype: "json",
+                success: function (data) {
+                    if (data.status == false) {
+                        flag = false;
+                    }
+                }
+            });
+        }
+        if(flag){
+            alert("保存成功");
+            location.reload();
+        }else{
+            alert("保存失败");
+        }
+    }
+</script>
+</body>
+</html>

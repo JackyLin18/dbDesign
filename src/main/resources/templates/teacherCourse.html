@@ -43,6 +43,7 @@
             "<td width='80'>上课地点</td>" +
             "<td width='160'>考试时间</td>" +
             "<td width='80'>修改</td>" +
+            "<td width='100'>选课学生</td>" +
             "</tr>";
         for (var i = 0; i < courseList.length; i++) {
             tableData += "<tr align='center'>";
@@ -55,6 +56,7 @@
             tableData += "<td>" + courseList[i].classAddress + "</td>";
             tableData += "<td>" + getLocalTime(courseList[i].examTime) + "</td>";
             tableData += "<td>" + "<button onclick='courseMessage(" + courseList[i].id + ")'>进入修改</button>" + "</td>";
+            tableData += "<td>" + "<button onclick='getStudentByCourse(" + courseList[i].id + ")'>查看选修学生</button>" + "</td>";
             tableData += "</tr>";
         }
         $("#courseBody").html(tableData);
@@ -63,6 +65,10 @@
     function getLocalTime(timeStamp) {
         var dataee = new Date(timeStamp).toJSON();
         return new Date(+new Date(dataee)).toLocaleString().replace(/:\d{1,2}$/, ' ');
+    }
+
+    function getStudentByCourse(course_id) {
+        window.location.href = "studentList?courseId=" + course_id;
     }
 
     function courseMessage(courseId) {

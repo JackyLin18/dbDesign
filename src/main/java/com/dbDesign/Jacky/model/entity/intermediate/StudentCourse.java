@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import lombok.Data;
 
+import java.math.BigDecimal;
 import java.sql.Timestamp;
 
 /**
@@ -22,7 +23,7 @@ public class StudentCourse {
     @TableId(type = IdType.INPUT)
     private Integer courseId;
     // 课程成绩
-    private Integer grade;
+    private BigDecimal grade;
     // 创建时间
     @TableField(fill = FieldFill.INSERT,select = false)
     private Timestamp createTime;

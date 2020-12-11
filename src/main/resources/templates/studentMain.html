@@ -9,12 +9,12 @@
 <h1>欢迎你，学生&nbsp;&nbsp;<span th:text="${session.student.name}"></span>&nbsp;&nbsp;进入系统</h1>
 <h3>你可以进行以下操作：</h3>
 <button onclick="ownMessage()">个人信息</button>
-<br/>
-<button onclick="window.location.href='teacherSearch'">教师查询</button>
-<br/>
-<button onclick="window.location.href='courseSearch'">课程查询</button><br/>
+&nbsp;&nbsp;&nbsp;
 <button onclick="window.location.href='studentCourse'">查看个人选课</button>
 <br/>
+<button onclick="window.location.href='teacherSearch'">教师查询</button>
+&nbsp;&nbsp;&nbsp;
+<button onclick="window.location.href='courseSearch'">课程查询</button><br/>
 <button onclick="logout()" style="color: red">退出登录</button>
 <script type="text/javascript">
     function ownMessage() {

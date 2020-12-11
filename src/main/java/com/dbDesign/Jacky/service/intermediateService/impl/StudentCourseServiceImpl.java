@@ -46,44 +46,25 @@ public class StudentCourseServiceImpl implements StudentCourseService {
     }
 
     @Override
-    public ServiceResult saveStudentCourse(StudentCourse studentCourse) {
-        // 构建返回结果
-        HashMap<String, Object> resultMap = new HashMap<>();
-        // 尝试从数据库中查询是否有该学生选择该课程
-        // 构建查询条件
+    public ServiceResult saveGrade(StudentCourse studentCourse) {
+        // 获取studentId
+        Integer studentId = studentCourse.getStudentId();
+        // 获取courseId
+        Integer courseId = studentCourse.getCourseId();
+        // 构建条件查询器
         QueryWrapper<StudentCourse> wrapper = new QueryWrapper<>();
-        wrapper.eq("student_id", studentCourse.getStudentId());
-        wrapper.eq("course_id", studentCourse.getCourseId());
-        // 查询符合条件的studentCourse数据
+        wrapper.eq("student_id", studentId);
+        wrapper.eq("course_id", courseId);
+        // 查询是否存在选课信息
         StudentCourse sc = studentCourseMapper.selectOne(wrapper);
-        // 判断查询结果是否为空
         if (sc == null) {
-            // 查询结果为空，进行插入操作
-            int insert = studentCourseMapper.insert(studentCourse);
-            resultMap.put("insert", insert);
-        } else {
-            // 查询结果不为空，进行更新操作
-            int update = studentCourseMapper.update(studentCourse, wrapper);
-            resultMap.put("update", update);
-        }
-        return ServiceResult.ok().setData(resultMap);
-    }
-
-    @Override
-    public ServiceResult getStudentListByCourseId(Integer courseId) {
-        // 查询出选修了指定courseId的student的studentId集合
-        List<Integer> studentIdList = studentCourseMapper.selectStudentIdListByCourseId(courseId);
-        // 判断查询结果是否为空
-        if (studentIdList.size() == 0) {
             return ServiceResult.fail(CodeEnum.NULL_RESULT);
         }
-        // 批量查询出所有student
-        List<Student> students = studentMapper.selectBatchIds(studentIdList);
-        // 判断查询结果是否为空
-        if (students.size() == 0) {
-            return ServiceResult.fail(CodeEnum.NULL_RESULT);
+        int update = studentCourseMapper.update(studentCourse, wrapper);
+        if (update > 0) {
+            return ServiceResult.ok();
         }
-        return ServiceResult.ok("students", students);
+        return ServiceResult.fail();
     }
 
     @Override
@@ -153,6 +134,47 @@ public class StudentCourseServiceImpl implements StudentCourseService {
             // 删除失败
             return ServiceResult.fail(CodeEnum.NULL_RESULT);
         }
+    }
+
+    @Override
+    public ServiceResult getGrade(Integer studentId, Integer courseId) {
+        // 构造条件查询器
+        QueryWrapper<StudentCourse> wrapper = new QueryWrapper<>();
+        wrapper.eq("student_id", studentId);
+        wrapper.eq("course_id", courseId);
+        StudentCourse studentCourse = studentCourseMapper.selectOne(wrapper);
+        if (studentCourse == null) {
+            return ServiceResult.fail(CodeEnum.NULL_RESULT);
+        }
+        BigDecimal grade = studentCourse.getGrade();
+        if (grade == null) {
+            return ServiceResult.fail(CodeEnum.NULL_RESULT);
+        }
+        return ServiceResult.ok("grade", grade);
+    }
+
+    @Override
+    public ServiceResult getGradesByCourseId(Integer courseId) {
+        // 构建条件查询器
+        QueryWrapper<StudentCourse> wrapper = new QueryWrapper<>();
+        wrapper.eq("course_id", courseId);
+        List<StudentCourse> studentCourses = studentCourseMapper.selectList(wrapper);
+        if (studentCourses.size() == 0) {
+            return ServiceResult.fail(CodeEnum.NULL_RESULT);
+        }
+        return ServiceResult.ok("studentCourses", studentCourses);
+    }
+
+    @Override
+    public ServiceResult getGradesByStudentId(Integer studentId) {
+        // 构建条件查询器
+        QueryWrapper<StudentCourse> wrapper = new QueryWrapper<>();
+        wrapper.eq("student_id",studentId);
+        List<StudentCourse> studentCourses = studentCourseMapper.selectList(wrapper);
+        if (studentCourses.size() == 0) {
+            return ServiceResult.fail(CodeEnum.NULL_RESULT);
+        }
+        return ServiceResult.ok("studentCourses", studentCourses);
     }
 
     @Override

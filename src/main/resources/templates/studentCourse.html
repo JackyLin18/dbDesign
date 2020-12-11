@@ -16,6 +16,7 @@
 </body>
 
 <script type="text/javascript">
+    var courseList;
     $(function () {
         var student_id = $("#student_id").val();
         $.ajax({
@@ -27,7 +28,16 @@
                     type: "GET",
                     url: "course/student?studentId=" + student_id,
                     success: function (data) {
-                        showCourses(data.data);
+                        courseList = data.data;
+                        showCourses(courseList);
+                        $.ajax({
+                            type: "GET",
+                            url: "studentCourse/grades/student?studentId=" + student_id,
+                            success: function (data) {
+                                var studentCourses = data.data;
+                                showGrade(studentCourses);
+                            }
+                        })
                     }
                 });
             }
@@ -49,6 +59,7 @@
             "<td width='80'>上课地点</td>" +
             "<td width='160'>考试时间</td>" +
             "<td width='60'>退课</td>" +
+            "<td width='60'>成绩</td> " +
             "</tr>";
         for (var i = 0; i < courseList.length; i++) {
             tableData += "<tr align='center'>";
@@ -61,9 +72,22 @@
             tableData += "<td>" + courseList[i].classAddress + "</td>";
             tableData += "<td>" + getLocalTime(courseList[i].examTime) + "</td>";
             tableData += "<td>" + "<button style='color: red' onclick='cancelChoose(" + courseList[i].id + ")'>退课</button>" + "</td>";
+            tableData += "<td>" +"<input readonly='readonly' style='width: 60px' id='" + "course" + courseList[i].id + "'/>"+"</td>"
             tableData += "</tr>";
         }
         $("#courseBody").html(tableData);
+    }
+
+    function showGrade(studentCourses) {
+        for (var i = 0; i < courseList.length; i++) {
+            var grade = $(("#course" + courseList[i].id));
+            for (var j = 0; j < studentCourses.length; j++) {
+                if (courseList[i].id == studentCourses[j].courseId) {
+                    grade.val(studentCourses[j].grade);
+                    break;
+                }
+            }
+        }
     }
 
     function getLocalTime(timeStamp) {

@@ -133,12 +133,18 @@ public class ViewHandler {
     }
 
     @RequestMapping("/studentCourse")
-    public String studentCourse(HttpServletRequest request){
+    public String studentCourse(HttpServletRequest request) {
         HttpSession session = request.getSession();
         Student student = (Student) session.getAttribute("student");
-        if(student == null){
+        if (student == null) {
             return "login";
         }
         return "studentCourse";
+    }
+
+    @RequestMapping("/studentList")
+    public String studentList(@RequestParam Integer courseId, HttpServletRequest request) {
+        request.setAttribute("courseId",courseId);
+        return "studentList";
     }
 }
