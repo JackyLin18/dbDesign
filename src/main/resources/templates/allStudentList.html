@@ -49,6 +49,7 @@
             "<td width='100'>学院</td>" +
             "<td>转学/毕业</td>" +
             "<td>退学</td>" +
+            "<td>进入修改</td>" +
             "</tr>";
         for (var i = 0; i < studentList.length; i++) {
             tableData += "<tr align='center'>";
@@ -61,6 +62,7 @@
             tableData += "<td>" + "<button onclick='transferStudent("+studentList[i].id+")'>转学</button>";
             tableData += "<button onclick='graduateStudent("+studentList[i].id+")'>毕业</button>"+"</td>";
             tableData += "<td>" + "<button style='color: red' onclick='deleteStudent("+studentList[i].id+")'>退学</button></td>";
+            tableData += "<td>" + "<button onclick='updateStudent("+studentList[i].id+")'>进入修改</button>";
             tableData += "</tr>";
         }
         $("#studentsBody").html(tableData);
@@ -81,6 +83,10 @@
 
     function transferStudent(student_id) {
         remoteStudent(student_id,1);
+    }
+
+    function updateStudent(student_id) {
+        window.location.href = "studentMessage?id="+student_id
     }
 
     function graduateStudent(student_id) {

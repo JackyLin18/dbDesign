@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <script type="text/javascript" src="/dbDesign/js/jquery-3.4.1.js"></script>
+    <script type="text/javascript" src="/dbDesign/js/DatePicker.js"></script>
+    <title th:text="'教师信息'"></title>
+</head>
+<body>
+<label>
+    <input hidden="hidden" id="teacher_id" th:value="${#request.getAttribute('teacherId')}">
+</label>
+教职工号：&nbsp;<label for="id"></label><input readonly="readonly" id="id"/><br/>
+姓&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;名：<label>
+    <input type="text" id="name">
+</label><br/>
+性&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;别：<label>
+    <input type="radio" name="sex" value="1">
+</label>男
+<label><input type="radio" name="sex" value="2">
+</label>女<br/>
+出生年月：<label>
+    <input id="birthday" onclick="setmonth(this)">
+</label><br/>
+学&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;院：&nbsp;<label for="department"></label><select id="department">
+</select><br/>
+职&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;称：<label for="title"></label><input id="title"><br/>
+专&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;业：<label for="major"></label><input id="major"><br/>
+教学方向：<label for="teaching_direction"></label>
+<textarea rows="8" maxlength="50" id="teaching_direction" placeholder="50字以内"></textarea><br/>
+<input type="button" value="修改" onclick="updateTeacher()">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<input type="button" onclick="window.history.back(-1)" value="返回上一页">
+
+<script type="text/javascript">
+    var departments;
+    $(function () {
+        $.ajax({
+            type: "GET",
+            url: 'department/all',
+            success: function (data) {
+                departments = data.data;
+                var optionString = "";
+                for (var i = 0; i < departments.length; i++) {
+                    var department = departments[i];
+                    optionString += "<option value=\"" + department.id + "\">" + department.name + "</option>";
+                    $("#department").html("<option value=''>请选择...</option>" + optionString);
+                }
+                var teacher_id = $("#teacher_id").val();
+                $.ajax({
+                    type: "GET",
+                    url: "teacher?id=" + teacher_id,
+                    success: function (data) {
+                        var teacher = data.data;
+                        console.log(teacher);
+                        writeTeacherMessage(teacher);
+                    }
+                });
+            }
+        });
+    });
+
+    function writeTeacherMessage(teacher) {
+        $("#id").val(teacher.id);
+        $("#name").val(teacher.name);
+        var sex = document.getElementsByName("sex");
+        if(teacher.sex == 1){
+            sex[0].checked = true;
+        }else if(teacher.sex == 2){
+            sex[1].checked = true;
+        }
+        var departmentId = teacher.departmentId;
+        var departments = document.getElementById("department");
+        for (var i = 0; i < departments.length; i++) {
+            if (departments.options[i].value == departmentId) {
+                $(departments[i]).prop("selected", "selected");
+            }
+        }
+        $("#title").val(teacher.title);
+        $("#major").val(teacher.major);
+        $("#teaching_direction").text(teacher.teachingDirection);
+        $("#birthday").val(teacher.birthday.toString().substr(0,7));
+    }
+</script>
+
+<script type="text/javascript">
+    function updateTeacher() {
+        var id = document.getElementById("id").value;
+        var name = document.getElementById("name").value;
+        var sexRadio = document.getElementsByName("sex");
+        var sex;
+        for (var i = 0; i < sexRadio.length; i++) {
+            if (sexRadio[i].checked) {
+                sex = sexRadio[i].value;
+            }
+        }
+        var birthday = document.getElementById("birthday").value;
+        var department = document.getElementById("department").value;
+        var title = document.getElementById("title").value;
+        var major = document.getElementById("major").value;
+        var teaching_direction = $("#teaching_direction").val();
+
+        // 修改student
+        var param = {
+            "name": name, "sex": sex,
+            "birthday": birthday,
+            "title":title,"major":major,
+            "teaching_direction":teaching_direction,
+            "department_id": department, "id": id
+        };
+        $.ajax({
+            type: "PUT",
+            url: 'teacher',
+            data: {params: JSON.stringify(param)},
+            datatype: "json",
+            success: function (data) {
+                if(data.status == true){
+                    window.history.back(-1);
+                }else{
+                    alert("修改失败");
+                }
+            }
+        });
+    }
+</script>
+</body>
+</html>

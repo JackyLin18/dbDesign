@@ -144,12 +144,12 @@ public class ViewHandler {
 
     @RequestMapping("/studentList")
     public String studentList(@RequestParam Integer courseId, HttpServletRequest request) {
-        request.setAttribute("courseId",courseId);
+        request.setAttribute("courseId", courseId);
         return "studentList";
     }
 
     @RequestMapping("/allStudentList")
-    public String allStudentList(HttpServletRequest request){
+    public String allStudentList(HttpServletRequest request) {
         Administrator administrator = (Administrator)
                 request.getSession().getAttribute("administrator");
         if (administrator == null) {
@@ -158,13 +158,45 @@ public class ViewHandler {
         return "allStudentList";
     }
 
+    @RequestMapping("/allTeacherList")
+    public String allTeacherList(HttpServletRequest request){
+        Administrator administrator = (Administrator)
+                request.getSession().getAttribute("administrator");
+        if (administrator == null) {
+            return "login";
+        }
+        return "allTeacherList";
+    }
+
     @RequestMapping("/allStudentHistory")
-    public String allStudentHistory(HttpServletRequest request){
+    public String allStudentHistory(HttpServletRequest request) {
         Administrator administrator = (Administrator)
                 request.getSession().getAttribute("administrator");
         if (administrator == null) {
             return "login";
         }
         return "allStudentHistory";
+    }
+
+    @RequestMapping("/studentMessage")
+    public String studentMessage(@RequestParam Integer id, HttpServletRequest request) {
+        Administrator administrator = (Administrator)
+                request.getSession().getAttribute("administrator");
+        if (administrator == null) {
+            return "login";
+        }
+        request.setAttribute("studentId", id);
+        return "studentMessage";
+    }
+
+    @RequestMapping("/teacherMessage")
+    public String teacherMessage(@RequestParam Integer id, HttpServletRequest request) {
+        Administrator administrator = (Administrator)
+                request.getSession().getAttribute("administrator");
+        if (administrator == null) {
+            return "login";
+        }
+        request.setAttribute("teacherId", id);
+        return "teacherMessage";
     }
 }

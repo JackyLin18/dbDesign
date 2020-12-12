@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <script type="text/javascript" src="/dbDesign/js/jquery-3.4.1.js"></script>
+    <title th:text="'学生信息'"></title>
+</head>
+<body>
+<label>
+    <input hidden="hidden" id="student_id" th:value="${#request.getAttribute('studentId')}">
+</label>
+学&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;号：&nbsp;<label for="id"></label><input readonly="readonly" id="id"/><br/>
+姓&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;名：<label>
+    <input type="text" id="name">
+</label><br/>
+性&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;别：<label>
+    <input type="radio" name="sex" value="1">
+</label>男
+<label><input type="radio" name="sex" value="2">
+</label>女<br/>
+出生日期：<label>
+    <input type="date" id="birthday">
+</label><br/>
+入学成绩：<label>
+    <input type="number" id="enrolled_score">
+</label><br/>
+学&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;院：&nbsp;<select id="department">
+</select><br/>
+<input type="button" value="修改" onclick="updateStudent()">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<input type="button" onclick="window.history.back(-1)" value="返回上一页">
+
+<script type="text/javascript">
+    var departments;
+    $(function () {
+        $.ajax({
+            type: "GET",
+            url: 'department/all',
+            success: function (data) {
+                departments = data.data;
+                var optionString = "";
+                for (var i = 0; i < departments.length; i++) {
+                    var department = departments[i];
+                    optionString += "<option value=\"" + department.id + "\">" + department.name + "</option>";
+                    $("#department").html("<option value=''>请选择...</option>" + optionString);
+                }
+                var student_id = $("#student_id").val();
+                $.ajax({
+                    type: "GET",
+                    url: "student?id=" + student_id,
+                    success: function (data) {
+                        var student = data.data;
+                        writeStudent(student);
+                    }
+                });
+            }
+        });
+    })
+</script>
+
+<script th:inline="javascript" type="text/javascript">
+    function writeStudent(student) {
+        $("#id").val(student.id);
+        $("#name").val(student.name);
+        var sex = document.getElementsByName("sex");
+        if(student.sex == 1){
+            sex[0].checked = true;
+        }else if(student.sex == 2){
+            sex[1].checked = true;
+        }
+        $("#birthday").val(student.birthday);
+        $("#enrolled_score").val(student.enrolledScore);
+        var departmentId = student.departmentId;
+        var departments = document.getElementById("department");
+        for (var i = 0; i < departments.length; i++) {
+            if (departments.options[i].value == departmentId) {
+                $(departments[i]).prop("selected", "selected");
+            }
+        }
+    }
+</script>
+
+<script type="text/javascript">
+    function updateStudent() {
+        var id = document.getElementById("id").value;
+        var name = document.getElementById("name").value;
+        var sexRadio = document.getElementsByName("sex");
+        var sex;
+        for (var i = 0; i < sexRadio.length; i++) {
+            if (sexRadio[i].checked) {
+                sex = sexRadio[i].value;
+            }
+        }
+        var birthday = document.getElementById("birthday").value;
+        var enrolled_score = document.getElementById("enrolled_score").value;
+        var department = document.getElementById("department").value;
+
+        // 修改student
+        var param = {
+            "name": name, "sex": sex,
+            "birthday": birthday, "enrolled_score": enrolled_score,
+            "department_id": department, "id": id
+        };
+        $.ajax({
+            type: "PUT",
+            url: 'student',
+            data: {params: JSON.stringify(param)},
+            datatype: "json",
+            success: function (data) {
+                if(data.status == true){
+                    window.history.back(-1);
+                }else{
+                    alert("修改失败");
+                }
+            }
+        });
+    }
+</script>
+</body>
+</html>

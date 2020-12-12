@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>所有教师信息</title>
+    <script type="text/javascript" src="/dbDesign/js/jquery-3.4.1.js"></script>
+</head>
+<body>
+<input type="button" value="返回上一个页面" onclick="javascript:window.history.back(-1);">
+<br/>
+<table border="1">
+    <tbody id="teachersBody">
+    </tbody>
+</table>
+<script type="text/javascript">
+    var departments;
+    var teacherList;
+    $(function () {
+        $.ajax({
+            type: "GET",
+            url: 'department/all',
+            data: {},
+            success: function (data) {
+                departments = data.data;
+                $.ajax({
+                    type: "GET",
+                    url: "teacher/all",
+                    success: function (data) {
+                        teacherList = data.data;
+                        showTeacherList(teacherList);
+                    }
+                })
+            }
+        });
+    })
+</script>
+
+<script type="text/javascript">
+    var teacherListLength;
+
+    function showTeacherList(teacherList) {
+        teacherListLength = teacherList.length;
+        var tableData = "<tr align='center'>" +
+            "<td width='80'>教职工号</td>" +
+            "<td width='60'>姓名</td>" +
+            "<td width='60'>性别</td>" +
+            "<td width='100'>出生年月</td>" +
+            "<td width='100'>学院</td>" +
+            "<td width='80'>职称</td>" +
+            "<td width='120'>专业</td>" +
+            "<td width='500'>教学方向</td>" +
+            "<td>进入修改</td>" +
+            "</tr>";
+        for (var i = 0; i < teacherList.length; i++) {
+            tableData += "<tr align='center'>";
+            tableData += "<td>" + teacherList[i].id + "</td>";
+            tableData += "<td>" + teacherList[i].name + "</td>";
+            tableData += "<td>" + (teacherList[i].sex == 0 ? '未知' : (teacherList[i].sex == 1 ? '男' : '女')) + "</td>";
+            tableData += "<td>" + teacherList[i].birthday.slice(0, 7) + "</td>";
+            tableData += "<td>" + getDepartmentName(teacherList[i].departmentId) + "</td>";
+            tableData += "<td>" + teacherList[i].title + "</td>";
+            tableData += "<td>" + teacherList[i].major + "</td>";
+            tableData += "<td align='left'>" + teacherList[i].teachingDirection + "</td>";
+            tableData += "<td>" + "<button onclick='updateTeacher("+teacherList[i].id+")'>进入修改</button>";
+            tableData += "</tr>";
+        }
+        $("#teachersBody").html(tableData);
+    }
+</script>
+
+<script>
+    $(function () {
+        $.ajax({
+            type: "GET",
+            url: 'department/all',
+            data: {},
+            success: function (data) {
+                departments = data.data;
+            }
+        });
+    });
+
+    function updateTeacher(teacher_id) {
+        window.location.href = "teacherMessage?id="+teacher_id;
+    }
+
+    function getDepartmentName(departmentId) {
+        for (var i = 0; i < departments.length; i++) {
+            if (departments[i].id == departmentId) {
+                return departments[i].name;
+            }
+        }
+    }
+</script>
+</body>
+</html>

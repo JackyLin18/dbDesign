@@ -98,10 +98,6 @@ public class TeacherController {
             Integer resultId = (Integer) serviceResult.getData().get("id");
             // 判断是否为更新操作
             Integer update = (Integer) serviceResult.getData().get("update");
-            if (update != null) {
-                // 将修改的teacher信息存入session
-                request.getSession().setAttribute("teacher", teacher);
-            }
             return JSONResponseEnum.SUCCESS_RESPONSE.getResponseValue().setData(resultId);
         } else if (resultCode.equals(CodeEnum.NULL_RESULT.getCode())) {
             // 返回值为空状态
