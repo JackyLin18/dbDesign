@@ -147,4 +147,24 @@ public class ViewHandler {
         request.setAttribute("courseId",courseId);
         return "studentList";
     }
+
+    @RequestMapping("/allStudentList")
+    public String allStudentList(HttpServletRequest request){
+        Administrator administrator = (Administrator)
+                request.getSession().getAttribute("administrator");
+        if (administrator == null) {
+            return "login";
+        }
+        return "allStudentList";
+    }
+
+    @RequestMapping("/allStudentHistory")
+    public String allStudentHistory(HttpServletRequest request){
+        Administrator administrator = (Administrator)
+                request.getSession().getAttribute("administrator");
+        if (administrator == null) {
+            return "login";
+        }
+        return "allStudentHistory";
+    }
 }

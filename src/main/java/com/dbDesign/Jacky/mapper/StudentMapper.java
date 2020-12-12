@@ -11,4 +11,7 @@ import org.springframework.stereotype.Repository;
 public interface StudentMapper extends BaseMapper<Student> {
     @Select(value = "select password from student where id = #{studentId}")
     String selectPasswordByStudentId(Integer studentId);
+
+    @Select(value = "select * from student where id = #{studentId}")
+    Student selectAllMessageByStudentId(Integer studentId);
 }

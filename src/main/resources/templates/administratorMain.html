@@ -8,10 +8,22 @@
 <body>
 <h1>欢迎你，管理员（编号<span th:text="${session.administrator.id}"></span>）进入系统</h1>
 <h3>你可以进行以下操作：</h3>
-<button onclick="window.location.href='studentSearch'">学生查询</button><br/>
-<button onclick="window.location.href='teacherSearch'">教师查询</button><br/>
+<button onclick="window.location.href='studentSearch'">学生查询</button>
+&nbsp;&nbsp;&nbsp;
+<button onclick="window.location.href='allStudentList'">学生管理</button>
+&nbsp;&nbsp;&nbsp;
+<button onclick="window.location.href='allStudentHistory'">学生历史库</button>
+<br/>
+<button onclick="window.location.href='teacherSearch'">教师查询</button>
+&nbsp;&nbsp;&nbsp;
+<button>教师管理</button>
+<br/>
+<button onclick="window.location.href='courseSearch'">课程查询</button>
+&nbsp;&nbsp;&nbsp;
 <button onclick="window.location.href='courseDo'">课程管理</button><br/>
-<button onclick="window.location.href='courseSearch'">课程查询</button><br/>
+<button>系别查询</button>
+&nbsp;&nbsp;&nbsp;
+<button>系别管理</button><br/>
 <button onclick="logout()" style="color: red">退出登录</button>
 <script type="text/javascript">
     function logout(){

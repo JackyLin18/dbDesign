@@ -19,6 +19,8 @@ public interface StudentService {
 
     ServiceResult getStudentListByOption(Student student,Integer scoreType);
 
+    ServiceResult getAllStudentList();
+
     ServiceResult remoteStudentByStudentId(Integer studentId,Integer reason);
 
     ServiceResult loginStudent(Integer id,String inputPassword);

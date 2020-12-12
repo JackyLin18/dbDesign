@@ -10,7 +10,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -29,33 +28,14 @@ public class StudentHistoryServiceImpl implements StudentHistoryService {
     }
 
     @Override
-    public ServiceResult saveStudentHistory(StudentHistory studentHistory) {
-        // 获取该studentHistory对应的id
-        Integer id = studentHistory.getId();
-        // 判断是否含有id
-        if (id == null) {
-            // 不含id，返回参数不全状态
-            return ServiceResult.fail(CodeEnum.PARAMETER_MISSING);
+    public ServiceResult getAllStudentHistory() {
+        QueryWrapper<StudentHistory> wrapper = new QueryWrapper<>();
+        wrapper.orderByAsc("reason");
+        List<StudentHistory> studentHistories = studentHistoryMapper.selectList(wrapper);
+        if(studentHistories.size() == 0){
+            return ServiceResult.fail(CodeEnum.NULL_RESULT);
         }
-        // 构建返回结果map
-        HashMap<String, Object> resultMap = new HashMap<>();
-        // 判断数据库中是否已经含有该id对应的数据
-        if (studentHistoryMapper.selectById(id) == null) {
-            // 进行插入操作
-            int insert = studentHistoryMapper.insert(studentHistory);
-            if (insert > 0) {
-                resultMap.put("insert", insert);
-                return ServiceResult.ok().setData(resultMap);
-            }
-        } else {
-            // 进行更新操作
-            int update = studentHistoryMapper.updateById(studentHistory);
-            if (update > 0) {
-                resultMap.put("update", update);
-                return ServiceResult.ok().setData(resultMap);
-            }
-        }
-        return ServiceResult.fail();
+        return ServiceResult.ok("studentHistories",studentHistories);
     }
 
     @Override

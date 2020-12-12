@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>学生历史库</title>
+    <script type="text/javascript" src="/dbDesign/js/jquery-3.4.1.js"></script>
+</head>
+<body>
+<input type="button" value="返回上一个页面" onclick="javascript:window.history.back(-1);">
+<br/>
+<table border="1">
+    <tbody id="studentsBody">
+    </tbody>
+</table>
+<script type="text/javascript">
+    var departments;
+    var studentList;
+    $(function () {
+        $.ajax({
+            type: "GET",
+            url: 'department/all',
+            data: {},
+            success: function (data) {
+                departments = data.data;
+                $.ajax({
+                    type: "GET",
+                    url: "studentHistory/all",
+                    success: function (data) {
+                        studentList = data.data;
+                        showStudentList(studentList);
+                    }
+                })
+            }
+        });
+    })
+</script>
+
+<script type="text/javascript">
+    var studentListLength;
+
+    function showStudentList(studentList) {
+        studentListLength = studentList.length;
+        var tableData = "<tr align='center'>" +
+            "<td width='60'>学号</td>" +
+            "<td width='60'>姓名</td>" +
+            "<td width='60'>性别</td>" +
+            "<td width='100'>出生日期</td>" +
+            "<td width='80'>入学成绩</td>" +
+            "<td width='100'>学院</td>" +
+            "<td width='60'>原因</td>" +
+            "</tr>";
+        for (var i = 0; i < studentList.length; i++) {
+            tableData += "<tr align='center'>";
+            tableData += "<td>" + studentList[i].id + "</td>";
+            tableData += "<td>" + studentList[i].name + "</td>";
+            tableData += "<td>" + (studentList[i].sex == 0 ? '未知' : (studentList[i].sex == 1 ? '男' : '女')) + "</td>";
+            tableData += "<td>" + studentList[i].birthday + "</td>";
+            tableData += "<td>" + studentList[i].enrolledScore + "分" + "</td>";
+            tableData += "<td>" + getDepartmentName(studentList[i].departmentId) + "</td>";
+            tableData += "<td>" + getReasonName(studentList[i].reason) + "</td>";
+            tableData += "</tr>";
+        }
+        $("#studentsBody").html(tableData);
+    }
+</script>
+
+<script>
+    $(function () {
+        $.ajax({
+            type: "GET",
+            url: 'department/all',
+            data: {},
+            success: function (data) {
+                departments = data.data;
+            }
+        });
+    });
+
+    function getReasonName(reason_id) {
+        var reason_name;
+        switch (reason_id) {
+            case 1:
+                reason_name = "转学";
+                break;
+            case 2:
+                reason_name = "毕业";
+                break;
+            case 3:
+                reason_name = "退学";
+                break;
+            default:
+                reason_name = "未知";
+                break;
+        }
+        return reason_name;
+    }
+
+    function getDepartmentName(departmentId) {
+        for (var i = 0; i < departments.length; i++) {
+            if (departments[i].id == departmentId) {
+                return departments[i].name;
+            }
+        }
+    }
+</script>
+</body>
+</html>

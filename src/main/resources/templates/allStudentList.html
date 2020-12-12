@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>所有学生信息</title>
+    <script type="text/javascript" src="/dbDesign/js/jquery-3.4.1.js"></script>
+</head>
+<body>
+<input type="button" value="返回上一个页面" onclick="javascript:window.history.back(-1);">
+<br/>
+<table border="1">
+    <tbody id="studentsBody">
+    </tbody>
+</table>
+<script type="text/javascript">
+    var departments;
+    var studentList;
+    $(function () {
+        $.ajax({
+            type: "GET",
+            url: 'department/all',
+            data: {},
+            success: function (data) {
+                departments = data.data;
+                $.ajax({
+                    type: "GET",
+                    url: "student/all",
+                    success: function (data) {
+                        studentList = data.data;
+                        showStudentList(studentList);
+                    }
+                })
+            }
+        });
+    })
+</script>
+
+<script type="text/javascript">
+    var studentListLength;
+
+    function showStudentList(studentList) {
+        studentListLength = studentList.length;
+        var tableData = "<tr align='center'>" +
+            "<td width='60'>学号</td>" +
+            "<td width='60'>姓名</td>" +
+            "<td width='60'>性别</td>" +
+            "<td width='100'>出生日期</td>" +
+            "<td width='80'>入学成绩</td>" +
+            "<td width='100'>学院</td>" +
+            "<td>转学/毕业</td>" +
+            "<td>退学</td>" +
+            "</tr>";
+        for (var i = 0; i < studentList.length; i++) {
+            tableData += "<tr align='center'>";
+            tableData += "<td>" + studentList[i].id + "</td>";
+            tableData += "<td>" + studentList[i].name + "</td>";
+            tableData += "<td>" + (studentList[i].sex == 0 ? '未知' : (studentList[i].sex == 1 ? '男' : '女')) + "</td>";
+            tableData += "<td>" + studentList[i].birthday + "</td>";
+            tableData += "<td>" + studentList[i].enrolledScore + "分" + "</td>";
+            tableData += "<td>" + getDepartmentName(studentList[i].departmentId) + "</td>";
+            tableData += "<td>" + "<button onclick='transferStudent("+studentList[i].id+")'>转学</button>";
+            tableData += "<button onclick='graduateStudent("+studentList[i].id+")'>毕业</button>"+"</td>";
+            tableData += "<td>" + "<button style='color: red' onclick='deleteStudent("+studentList[i].id+")'>退学</button></td>";
+            tableData += "</tr>";
+        }
+        $("#studentsBody").html(tableData);
+    }
+</script>
+
+<script>
+    $(function () {
+        $.ajax({
+            type: "GET",
+            url: 'department/all',
+            data: {},
+            success: function (data) {
+                departments = data.data;
+            }
+        });
+    });
+
+    function transferStudent(student_id) {
+        remoteStudent(student_id,1);
+    }
+
+    function graduateStudent(student_id) {
+        remoteStudent(student_id,2);
+    }
+
+    function deleteStudent(student_id) {
+        remoteStudent(student_id,3);
+    }
+
+    function remoteStudent(student_id,reason_id) {
+        var param = {
+            "id":student_id,
+            "reason":reason_id
+        };
+        $.ajax({
+            type:"DELETE",
+            url:"student",
+            data: {params: JSON.stringify(param)},
+            datatype: "json",
+            success:function(data){
+                if(data.status == true){
+                    alert("操作成功");
+                    location.reload();
+                }else{
+                    alert("操作失败");
+                }
+            }
+        })
+    }
+
+    function getDepartmentName(departmentId) {
+        for (var i = 0; i < departments.length; i++) {
+            if (departments[i].id == departmentId) {
+                return departments[i].name;
+            }
+        }
+    }
+</script>
+</body>
+</html>

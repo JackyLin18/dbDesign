@@ -146,6 +146,38 @@ public class StudentController {
 
     /**
      * @Author Jacky
+     * @Description 查询所有学生
+     **/
+    @GetMapping("/all")
+    @ResponseBody
+    public JSONResponse allStudents() {
+        ServiceResult serviceResult;
+        try {
+            // 获取所有student
+            serviceResult = studentService.getAllStudentList();
+        } catch (Exception ex) {
+            // 捕获异常并返回失败状态
+            ex.printStackTrace();
+            return JSONResponseEnum.DATABASE_ERROR_RESPONSE.getResponseValue();
+        }
+        // 获取状态码
+        Integer resultCode = serviceResult.getCode();
+        // 判断状态码
+        if (resultCode.equals(CodeEnum.SUCCESS.getCode())) {
+            // 成功
+            // 获取student集合
+            List<Student> students = ListUtil.castList(
+                    serviceResult.getData().get("students"), Student.class);
+            return JSONResponseEnum.SUCCESS_RESPONSE.getResponseValue().setData(students);
+        } else if (resultCode.equals(CodeEnum.NULL_RESULT.getCode())) {
+            // 返回值为空
+            return JSONResponseEnum.NULL_RESULT_RESPONSE.getResponseValue();
+        }
+        return JSONResponseEnum.OTHER_ERROR_RESPONSE.getResponseValue();
+    }
+
+    /**
+     * @Author Jacky
      * @Param departmentId 指定的 departmentId
      * @Description 查询出指定 departmentId 的 student 集合
      **/
@@ -282,12 +314,17 @@ public class StudentController {
 
     @DeleteMapping
     @ResponseBody
-    public JSONResponse deleteStudent(@RequestParam Integer id,
-                                      @RequestParam Integer reason) {
+    public JSONResponse deleteStudent(@RequestParam String params) {
         // 判断必要参数是否为空
-        if (id == null) {
-            return JSONResponseEnum.PARAMETER_MISSING_RESPONSE.getResponseValue();
+        if (params == null) {
+            return JSONResponseEnum.NULL_PARAM_RESPONSE.getResponseValue();
         }
+        // 将params转为JSONObject
+        JSONObject paramsJSONObject = JSONObject.parseObject(params);
+        // 获取id
+        Integer id = paramsJSONObject.getInteger("id");
+        // 获取reason
+        Integer reason = paramsJSONObject.getInteger("reason");
         ServiceResult serviceResult;
         try {
             serviceResult = studentService.remoteStudentByStudentId(id, reason);
