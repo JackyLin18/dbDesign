@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>系别管理</title>
+    <script type="text/javascript" src="/dbDesign/js/jquery-3.4.1.js"></script>
+</head>
+<body>
+<button onclick="window.history.back(-1)">返回上一页</button>
+<h3>添加系别</h3>
+系&nbsp;名&nbsp;称：<input id="name">&nbsp;&nbsp;&nbsp;
+系&nbsp;简&nbsp;介：<input id="introduction">&nbsp;&nbsp;&nbsp;
+<button onclick="addDepartment()">添加</button><br/><br/>
+<table border="1">
+    <tbody id="departmentsBody"></tbody>
+</table>
+<script type="text/javascript">
+    $(function () {
+        $.ajax({
+            type:"GET",
+            url:"department/all",
+            success:function (data) {
+                var departments = data.data;
+                showDepartments(departments);
+            }
+        })
+    });
+
+    function showDepartments(departments) {
+        var tableData = "<tr align='center'>" +
+            "<td width='60'>系号</td>" +
+            "<td width='100'>系名称</td>" +
+            "<td width='500'>系简介</td>" +
+            "<td>修改</td>" +
+            "<td>删除</td>" +
+            "</tr>";
+        for (var i = 0; i < departments.length; i++) {
+            tableData += "<tr align='center'>";
+            tableData += "<td>" + departments[i].id + "</td>";
+            tableData += "<td><input id='departmentName" + departments[i].id + "' value='"+departments[i].name +"'/></td>";
+            tableData += "<td><input maxlength='50' placeholder='最多输入50个字' style='width: 500px' id='departmentIntroduction" + departments[i].id + "' value='"+departments[i].introduction +"'/></td>";
+            tableData += "<td>" + "<button onclick='updateDepartment(" + departments[i].id+")'>修改</button>"
+            tableData += "<td>" + "<button style='color: red' onclick='remoteDepartment("+departments[i].id+")'>删除</button>"
+            tableData += "</tr>";
+        }
+        $("#departmentsBody").html(tableData);
+    }
+</script>
+
+<script type="text/javascript">
+    function addDepartment() {
+        var name = $("#name").val();
+        var introduction = $("#introduction").val();
+        var param = {
+            "name":name,
+            "introduction":introduction
+        };
+        $.ajax({
+            type:"POST",
+            url:"department",
+            data: {params: JSON.stringify(param)},
+            datatype: "json",
+            success:function (data) {
+                if(data.status == true){
+                    alert("添加成功");
+                    $("#name").val("");
+                    $("#introduction").val("");
+                    window.location.reload();
+                }else{
+                    alert("删除失败");
+                }
+            }
+        })
+    }
+
+    function remoteDepartment(department_id) {
+        $.ajax({
+            type:'DELETE',
+            url:"department",
+            data:{"id":department_id},
+            success:function (data) {
+                if(data.status == true){
+                    alert("删除成功");
+                    window.location.reload();
+                }else{
+                    alert("删除失败");
+                }
+            }
+        })
+    }
+
+    function updateDepartment(department_id) {
+        var nameId = "departmentName"+department_id;
+        var introductionId = "departmentIntroduction"+department_id;
+        var name = $(("#"+nameId)).val();
+        var introduction = $(("#")+introductionId).val();
+        var param = {
+            "id":department_id,"name":name,
+            "introduction":introduction
+        };
+        $.ajax({
+            type:"PUT",
+            url:"department",
+            data: {params: JSON.stringify(param)},
+            datatype: "json",
+            success:function (data) {
+                if(data.status == true){
+                    alert("修改成功");
+                    window.location.reload();
+                }else{
+                    alert("修改失败");
+                }
+            }
+        })
+    }
+</script>
+</body>
+</html>

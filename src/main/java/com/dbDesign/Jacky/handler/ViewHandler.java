@@ -159,7 +159,7 @@ public class ViewHandler {
     }
 
     @RequestMapping("/allTeacherList")
-    public String allTeacherList(HttpServletRequest request){
+    public String allTeacherList(HttpServletRequest request) {
         Administrator administrator = (Administrator)
                 request.getSession().getAttribute("administrator");
         if (administrator == null) {
@@ -198,5 +198,15 @@ public class ViewHandler {
         }
         request.setAttribute("teacherId", id);
         return "teacherMessage";
+    }
+
+    @RequestMapping("/allDepartmentList")
+    public String allDepartmentList(HttpServletRequest request) {
+        Administrator administrator = (Administrator)
+                request.getSession().getAttribute("administrator");
+        if (administrator == null) {
+            return "login";
+        }
+        return "allDepartmentList";
     }
 }
