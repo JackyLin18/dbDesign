@@ -10,16 +10,13 @@ ID号：<label for="id"></label><input type="text" id="id"/><br/>
 密码：<label for="password"></label><input type="password" id="password"/><br/>
 身份：<label>
     <select id="role">
-        <option value="1">教师</option>
-        <option value="2">学生</option>
+        <option value="1">学生</option>
+        <option value="2">教师</option>
         <option value="3">管理员</option>
     </select>
 </label>&nbsp;&nbsp;
 登录：<input type="button" value="登录" id="loginButton" onclick="login()"/><br/>
-<a href="registerStudent">点击此处前往注册学生</a><br/>
-<a href="registerTeacher">点击此处前往注册教师</a>
 </body>
-
 <script type="text/javascript">
     $(function () {
         history.pushState(null, null, document.URL);
@@ -33,7 +30,7 @@ ID号：<label for="id"></label><input type="text" id="id"/><br/>
         var id = document.getElementById("id").value;
         var password = document.getElementById("password").value;
         var param = {"id": id, "password": password};
-        if (role == 1) {
+        if (role == 2) {
             // 登录教师
             $.ajax({
                 type: "POST",
@@ -44,11 +41,13 @@ ID号：<label for="id"></label><input type="text" id="id"/><br/>
                     if(data.status === true){
                         alert("登录成功");
                         window.location.href="teacherMain";
+                    }else{
+                        alert("登录失败，请检查账号是否与密码对应！");
                     }
                 }
             });
         }
-        if (role == 2) {
+        if (role == 1) {
             // 登录学生
             $.ajax({
                 type: "POST",
@@ -59,6 +58,8 @@ ID号：<label for="id"></label><input type="text" id="id"/><br/>
                     if(data.status === true){
                         alert("登录成功");
                         window.location.href="studentMain";
+                    }else{
+                        alert("登录失败，请检查账号是否与密码对应！");
                     }
                 }
             });
@@ -74,6 +75,8 @@ ID号：<label for="id"></label><input type="text" id="id"/><br/>
                     if(data.status === true){
                         alert("登录成功");
                         window.location.href="administratorMain";
+                    }else{
+                        alert("登录失败，请检查账号是否与密码对应！");
                     }
                 }
             });

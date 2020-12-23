@@ -73,6 +73,9 @@ public class StudentController {
         // 获取专业id
         Integer departmentId = paramJSONObject.getInteger("department_id");
         student.setDepartmentId(departmentId);
+        if(departmentId == null){
+            student.setDepartmentId(0);
+        }
 
         ServiceResult serviceResult;
         try {

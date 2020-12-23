@@ -70,6 +70,9 @@ public class TeacherController {
         // 获取departmentId
         Integer departmentId = paramJSONObject.getInteger("department_id");
         teacher.setDepartmentId(departmentId);
+        if(departmentId == null){
+            teacher.setDepartmentId(0);
+        }
         // 获取title
         String title = paramJSONObject.getString("title");
         teacher.setTitle(title);

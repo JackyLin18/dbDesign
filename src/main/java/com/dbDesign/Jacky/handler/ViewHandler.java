@@ -17,18 +17,30 @@ import javax.servlet.http.HttpSession;
  **/
 @Controller
 public class ViewHandler {
-    @RequestMapping("/login")
+    @RequestMapping(value = {"/login","/index","/"})
     public String login() {
         return "login";
     }
 
     @RequestMapping("/registerStudent")
-    public String registerStudent() {
+    public String registerStudent(HttpServletRequest request) {
+        HttpSession session = request.getSession();
+        Administrator administrator =
+                (Administrator) session.getAttribute("administrator");
+        if (administrator == null) {
+            return "login";
+        }
         return "registerStudent";
     }
 
     @RequestMapping("/registerTeacher")
-    public String registerTeacher() {
+    public String registerTeacher(HttpServletRequest request) {
+        HttpSession session = request.getSession();
+        Administrator administrator =
+                (Administrator) session.getAttribute("administrator");
+        if (administrator == null) {
+            return "login";
+        }
         return "registerTeacher";
     }
 

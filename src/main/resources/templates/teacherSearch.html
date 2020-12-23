@@ -13,13 +13,11 @@
         id="department"></select><br/>
 职&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;称：<label for="title"></label><input id="title"/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 专&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;业：<input id="major"/><br/>
-<input type="button" onclick="studentSearch()" value="搜索"/>
+<input type="button" onclick="teacherSearch()" value="搜索"/>
 <input hidden="hidden" id="role"
        th:value="${session.teacher} != null ? 'teacher' : (${session.administrator} == null ? 'student' : 'administrator')"/>
-<input type="button"
-       onclick="window.location.href = (document.getElementById('role').value == 'teacher' ? 'teacherMain'
-       : (document.getElementById('role').value == 'administrator' ? 'administratorMain' :
-        'studentMain'))"
+<input type="button" style="position:absolute;top:10px;right:10px"
+       onclick="window.location.href = (document.getElementById('role').value == 'teacher' ? 'teacherMain' : 'administratorMain')"
        value="返回主页">
 <br/>
 <table border="1">
@@ -41,13 +39,21 @@
                     optionString += "<option value=\"" + department.id + "\">" + department.name + "</option>";
                     $("#department").html("<option value=''>请选择...</option>" + optionString);
                 }
+                $.ajax({
+                    type: "GET",
+                    url: "teacher/all",
+                    success: function (data) {
+                        teacherList = data.data;
+                        showTeacherList(teacherList);
+                    }
+                })
             }
         });
     })
 </script>
 
 <script type="text/javascript">
-    function studentSearch() {
+    function teacherSearch() {
         $("#teachersBody").html("");
         var id = document.getElementById("id").value;
         var name = document.getElementById("name").value;
@@ -79,7 +85,7 @@
             "<td width='60'>姓名</td>" +
             "<td width='60'>性别</td>" +
             "<td width='100'>出生年月</td>" +
-            "<td width='100'>学院</td>" +
+            "<td>学院</td>" +
             "<td width='80'>职称</td>" +
             "<td width='120'>专业</td>" +
             "<td width='500'>教学方向</td>" +

@@ -18,11 +18,8 @@
 专&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;业：<label for="major"></label><input type="text" id="major"/><br/>
 教学方向：<label for="teaching_direction"></label>
 <textarea rows="8" maxlength="50" id="teaching_direction" placeholder="50字以内"></textarea><br/>
-密&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;码：<label for="password"></label><input type="password"
-                                                                                        id="password"/><br/>
-重复密码：<label for="rePassword"></label><input type="password" id="rePassword"/><br/>
-<input type="button" value="注册" onclick="registerStudent()">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-<a href="login">返回登录页面</a>
+<input type="button" value="注册" onclick="registerTeacher()">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<button onclick="window.history.back(-1)">返回上一页</button>
 <script type="text/javascript">
     var departments;
     $(function () {
@@ -44,18 +41,7 @@
 </script>
 
 <script type="text/javascript">
-    function registerStudent() {
-        var password = document.getElementById("password").value;
-        var rePassword = document.getElementById("rePassword").value;
-        if (password !== rePassword) {
-            alert("重复密码不正确");
-            return;
-        }
-        if(password == null){
-            alert("密码不能为空");
-            return;
-        }
-
+    function registerTeacher() {
         var name = document.getElementById("name").value;
         var sexRadio = document.getElementsByName("sex");
         var sex;
@@ -72,7 +58,7 @@
 
         // 注册教师
         var param = {
-            "password": password, "name": name, "sex": sex,
+            "name": name, "sex": sex,
             "birthday": birthday, "department_id": department,
             "title": title, "major": major,
             "teaching_direction": teaching_direction
@@ -83,9 +69,21 @@
             data: {params: JSON.stringify(param)},
             datatype: "json",
             success: function (data) {
-                console.log(data);
-                alert("获得的教职工号为：" + data.data);
-                window.location.href = "login";
+                if(data.status == true){
+                    alert("注册成功，获得的教职工号为：" + data.data);
+                    $("#name").val("");
+                    $("#birthday").val("");
+                    $("#department").get(0).selectedIndex=0;
+                    var sexRadio = document.getElementsByName("sex");
+                    for (var i = 0; i < sexRadio.length; i++) {
+                        sexRadio[i].checked=false;
+                    }
+                    $("#title").val("");
+                    $("#major").val("");
+                    $("#teaching_direction").val("");
+                }else{
+                    alert("注册失败，原因："+data.message);
+                }
             }
         });
     }

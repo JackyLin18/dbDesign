@@ -51,6 +51,8 @@ public class StudentServiceImpl implements StudentService {
         // 判断student是否含有id
         if (student.getId() == null) {
             // student中不含有id，进行插入操作
+            // 设置默认密码为 000000
+            student.setPassword("000000");
             int insert = studentMapper.insert(student);
             if (insert > 0) {
                 resultData.put("insert", insert);

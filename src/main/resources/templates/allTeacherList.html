@@ -6,7 +6,20 @@
     <script type="text/javascript" src="/dbDesign/js/jquery-3.4.1.js"></script>
 </head>
 <body>
-<input type="button" value="返回上一个页面" onclick="javascript:window.history.back(-1);">
+<input type="button" style="position:absolute;top:10px;right:10px"
+       onclick="window.location.href = (document.getElementById('role').value == 'teacher' ? 'teacherMain' : 'administratorMain')"
+       value="返回主页">
+<h3>搜索条件</h3>
+教职工号：<label for="id"></label><input id="id"/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+姓&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;名：<label for="name"></label><input id="name"/><br/>
+学&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;院：<label for="department"></label><select
+        id="department"></select><br/>
+职&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;称：<label for="title"></label><input id="title"/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+专&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;业：<input id="major"/><br/>
+<input type="button" onclick="teacherSearch()" value="搜索"/>
+<input type="button" onclick="window.location.href='registerTeacher'" value="注册教师">
+<input hidden="hidden" id="role"
+       th:value="${session.teacher} != null ? 'teacher' : (${session.administrator} == null ? 'student' : 'administrator')"/>
 <br/>
 <table border="1">
     <tbody id="teachersBody">
@@ -22,6 +35,12 @@
             data: {},
             success: function (data) {
                 departments = data.data;
+                var optionString = "";
+                for (var i = 0; i < departments.length; i++) {
+                    var department = departments[i];
+                    optionString += "<option value=\"" + department.id + "\">" + department.name + "</option>";
+                    $("#department").html("<option value=''>请选择...</option>" + optionString);
+                }
                 $.ajax({
                     type: "GET",
                     url: "teacher/all",
@@ -45,7 +64,7 @@
             "<td width='60'>姓名</td>" +
             "<td width='60'>性别</td>" +
             "<td width='100'>出生年月</td>" +
-            "<td width='100'>学院</td>" +
+            "<td>学院</td>" +
             "<td width='80'>职称</td>" +
             "<td width='120'>专业</td>" +
             "<td width='500'>教学方向</td>" +
@@ -90,6 +109,32 @@
                 return departments[i].name;
             }
         }
+    }
+
+    function teacherSearch() {
+        $("#teachersBody").html("");
+        var id = document.getElementById("id").value;
+        var name = document.getElementById("name").value;
+        var department = document.getElementById("department").value;
+        var title = document.getElementById("title").value;
+        var major = document.getElementById("major").value;
+
+        // 搜索教师
+        var param = {
+            "id": id, "name": name,
+            "title": title, "major": major,
+            "department_id": department
+        };
+        $.ajax({
+            type: "GET",
+            url: 'teacher/option',
+            data: {optionParams: JSON.stringify(param)},
+            datatype: "json",
+            success: function (data) {
+                console.log(data);
+                showTeacherList(data.data);
+            }
+        });
     }
 </script>
 </body>

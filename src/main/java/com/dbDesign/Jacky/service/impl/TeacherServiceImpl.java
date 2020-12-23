@@ -44,6 +44,8 @@ public class TeacherServiceImpl implements TeacherService {
         // 判断teacher是否含有id
         if (teacher.getId() == null) {
             // teacher中不含id，进行插入操作
+            // 设置默认密码 000000
+            teacher.setPassword("000000");
             int insert = teacherMapper.insert(teacher);
             if (insert > 0) {
                 resultData.put("insert", insert);
