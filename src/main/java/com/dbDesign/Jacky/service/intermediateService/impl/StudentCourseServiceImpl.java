@@ -146,11 +146,17 @@ public class StudentCourseServiceImpl implements StudentCourseService {
         if (studentCourse == null) {
             return ServiceResult.fail(CodeEnum.NULL_RESULT);
         }
-        BigDecimal grade = studentCourse.getGrade();
-        if (grade == null) {
+        HashMap<String, Object> gradeMap = new HashMap<>();
+        BigDecimal usualGrade = studentCourse.getUsualGrade();
+        gradeMap.put("usualGrade", usualGrade);
+        BigDecimal examGrade = studentCourse.getExamGrade();
+        gradeMap.put("examGrade", examGrade);
+        BigDecimal totalGrade = studentCourse.getTotalGrade();
+        gradeMap.put("totalGrade", totalGrade);
+        if (gradeMap.size() == 0) {
             return ServiceResult.fail(CodeEnum.NULL_RESULT);
         }
-        return ServiceResult.ok("grade", grade);
+        return ServiceResult.ok().setData(gradeMap);
     }
 
     @Override
@@ -169,7 +175,7 @@ public class StudentCourseServiceImpl implements StudentCourseService {
     public ServiceResult getGradesByStudentId(Integer studentId) {
         // 构建条件查询器
         QueryWrapper<StudentCourse> wrapper = new QueryWrapper<>();
-        wrapper.eq("student_id",studentId);
+        wrapper.eq("student_id", studentId);
         List<StudentCourse> studentCourses = studentCourseMapper.selectList(wrapper);
         if (studentCourses.size() == 0) {
             return ServiceResult.fail(CodeEnum.NULL_RESULT);

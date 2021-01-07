@@ -59,7 +59,9 @@
             "<td width='80'>上课地点</td>" +
             "<td width='160'>考试时间</td>" +
             "<td width='60'>退课</td>" +
-            "<td width='60'>成绩</td> " +
+            "<td width='60'>平时成绩</td> " +
+            "<td width='60'>考试成绩</td> " +
+            "<td width='60'>总评成绩</td> " +
             "</tr>";
         for (var i = 0; i < courseList.length; i++) {
             tableData += "<tr align='center'>";
@@ -72,7 +74,9 @@
             tableData += "<td>" + courseList[i].classAddress + "</td>";
             tableData += "<td>" + getLocalTime(courseList[i].examTime) + "</td>";
             tableData += "<td>" + "<button style='color: red' onclick='cancelChoose(" + courseList[i].id + ")'>退课</button>" + "</td>";
-            tableData += "<td>" +"<input readonly='readonly' style='width: 60px' id='" + "course" + courseList[i].id + "'/>"+"</td>"
+            tableData += "<td>" +"<input readonly='readonly' style='width: 60px' id='" + "course_usual" + courseList[i].id + "'/>"+"</td>";
+            tableData += "<td>" +"<input readonly='readonly' style='width: 60px' id='" + "course_exam" + courseList[i].id + "'/>"+"</td>";
+            tableData += "<td>" +"<input readonly='readonly' style='width: 60px' id='" + "course_total" + courseList[i].id + "'/>"+"</td>";
             tableData += "</tr>";
         }
         $("#courseBody").html(tableData);
@@ -80,10 +84,14 @@
 
     function showGrade(studentCourses) {
         for (var i = 0; i < courseList.length; i++) {
-            var grade = $(("#course" + courseList[i].id));
+            var usual_grade = $(("#course_usual" + courseList[i].id));
+            var exam_grade = $(("#course_exam" + courseList[i].id));
+            var total_grade = $(("#course_total" + courseList[i].id));
             for (var j = 0; j < studentCourses.length; j++) {
                 if (courseList[i].id == studentCourses[j].courseId) {
-                    grade.val(studentCourses[j].grade);
+                    usual_grade.val(studentCourses[j].usualGrade);
+                    exam_grade.val(studentCourses[j].examGrade);
+                    total_grade.val(studentCourses[j].totalGrade);
                     break;
                 }
             }

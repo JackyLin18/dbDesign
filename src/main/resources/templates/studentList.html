@@ -59,7 +59,9 @@
             "<td width='100'>出生日期</td>" +
             "<td width='80'>入学成绩</td>" +
             "<td width='100'>学院</td>" +
-            "<td width='80'>科目成绩</td>" +
+            "<td width='80'>平时成绩</td>" +
+            "<td width='80'>考试成绩</td>" +
+            "<td width='80'>总评成绩</td>" +
             "</tr>";
         for (var i = 0; i < studentList.length; i++) {
             tableData += "<tr align='center'>";
@@ -69,7 +71,9 @@
             tableData += "<td>" + studentList[i].birthday + "</td>";
             tableData += "<td>" + studentList[i].enrolledScore + "分" + "</td>";
             tableData += "<td>" + getDepartmentName(studentList[i].departmentId) + "</td>";
-            tableData += "<td>" + "<input style='width: 80px' id='" + "student" + studentList[i].id + "'/>" + "</td>";
+            tableData += "<td>" + "<input style='width: 80px' id='" + "student_usual" + studentList[i].id + "'/>" + "</td>";
+            tableData += "<td>" + "<input style='width: 80px' id='" + "student_exam" + studentList[i].id + "'/>" + "</td>";
+            tableData += "<td>" + "<input readonly='readonly' style='width: 80px' id='" + "student_total" + studentList[i].id + "'/>" + "</td>";
             tableData += "</tr>";
         }
         $("#studentsBody").html(tableData);
@@ -98,10 +102,14 @@
 
     function showGrade(studentCourses) {
         for (var i = 0; i < studentList.length; i++) {
-            var grade = $(("#student" + studentList[i].id));
+            var usual_grade = $(("#student_usual" + studentList[i].id));
+            var exam_grade = $(("#student_exam" + studentList[i].id));
+            var total_grade = $(("#student_total" + studentList[i].id));
             for (var j = 0; j < studentCourses.length; j++) {
                 if (studentList[i].id == studentCourses[j].studentId) {
-                    grade.val(studentCourses[j].grade);
+                    usual_grade.val(studentCourses[j].usualGrade);
+                    exam_grade.val(studentCourses[j].examGrade);
+                    total_grade.val(studentCourses[j].totalGrade);
                     break;
                 }
             }
@@ -111,21 +119,32 @@
     function saveScore() {
         var flag = true;
         for (var i = 0; i < studentList.length; i++) {
-            var grade = $(("#student" + studentList[i].id)).val();
-            if(grade == ""){
-                grade = 0;
+            var usual_grade = $(("#student_usual" + studentList[i].id)).val();
+            var exam_grade = $(("#student_exam" + studentList[i].id)).val();
+            if(usual_grade == ""){
+                usual_grade = 0;
             }
-            if(grade<0){
-                grade=0;
+            if(exam_grade == ""){
+                exam_grade = 0;
             }
-            if(grade>100){
-                grade=100;
+            if(usual_grade<0){
+                usual_grade=0;
+            }
+            if(usual_grade>100){
+                usual_grade=100;
+            }
+            if(exam_grade<0){
+                exam_grade=0;
+            }
+            if(exam_grade>100){
+                exam_grade=100;
             }
             var course_id = $("#course_id").val();
             var param = {
                 "student_id": studentList[i].id,
                 "course_id": course_id,
-                "grade": grade
+                "usual_grade": usual_grade,
+                "exam_grade": exam_grade
             };
             $.ajax({
                 type: "POST",

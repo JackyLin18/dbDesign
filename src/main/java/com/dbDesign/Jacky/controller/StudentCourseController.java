@@ -79,7 +79,7 @@ public class StudentCourseController {
      * @Param params 需要保存的成绩信息
      * @Description 保存成绩（添加或更新）
      **/
-    @PostMapping("/grade")
+    @RequestMapping(value = "/grade",method = {RequestMethod.POST,RequestMethod.PUT})
     @ResponseBody
     public JSONResponse postGrade(@RequestParam String params) {
         // 判断必要参数是否为空
@@ -96,9 +96,12 @@ public class StudentCourseController {
         // 获取course_id
         Integer courseId = paramsJSONObject.getInteger("course_id");
         studentCourse.setCourseId(courseId);
-        // 获取成绩
-        BigDecimal grade = paramsJSONObject.getBigDecimal("grade");
-        studentCourse.setGrade(grade);
+        // 获取平时成绩
+        BigDecimal usualGrade = paramsJSONObject.getBigDecimal("usual_grade");
+        studentCourse.setUsualGrade(usualGrade);
+        // 获取考试成绩
+        BigDecimal examGrade = paramsJSONObject.getBigDecimal("exam_grade");
+        studentCourse.setExamGrade(examGrade);
 
         ServiceResult serviceResult;
         try {
@@ -273,6 +276,5 @@ public class StudentCourseController {
             return JSONResponseEnum.NULL_RESULT_RESPONSE.getResponseValue();
         }
         return JSONResponseEnum.OTHER_ERROR_RESPONSE.getResponseValue();
-
     }
 }

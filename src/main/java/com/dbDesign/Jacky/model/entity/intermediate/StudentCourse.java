@@ -22,8 +22,12 @@ public class StudentCourse {
     // 课程id
     @TableId(type = IdType.INPUT)
     private Integer courseId;
-    // 课程成绩
-    private BigDecimal grade;
+    // 平时成绩
+    private BigDecimal usualGrade;
+    // 考试成绩
+    private BigDecimal examGrade;
+    // 总评成绩
+    private BigDecimal totalGrade;
     // 创建时间
     @TableField(fill = FieldFill.INSERT,select = false)
     private Timestamp createTime;
@@ -36,7 +40,9 @@ public class StudentCourse {
         return "StudentCourse{" +
                 "studentId=" + studentId +
                 ", courseId=" + courseId +
-                ", grade=" + grade +
+                ", usualGrade=" + usualGrade +
+                ", examGrade=" + examGrade +
+                ", totalGrade=" + totalGrade +
                 '}';
     }
 }
