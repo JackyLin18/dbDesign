@@ -172,13 +172,63 @@ public class DepartmentController {
             // 获取成功
             List<Department> departments = ListUtil.castList(
                     serviceResult.getData().get("departments"), Department.class);
-            request.getSession().setAttribute("departments",departments);
+            request.getSession().setAttribute("departments", departments);
             // 返回成功状态
             return JSONResponseEnum.SUCCESS_RESPONSE.getResponseValue().setData(departments);
         } else if (resultCode.equals(CodeEnum.NULL_RESULT.getCode())) {
             // 返回值为空状态
             return JSONResponseEnum.NULL_RESULT_RESPONSE.getResponseValue();
         }
+        return JSONResponseEnum.OTHER_ERROR_RESPONSE.getResponseValue();
+    }
+
+    /**
+     * @Author Jacky
+     * @Param optionParams 指定的查询条件
+     * @Description 根据多个查询条件查询 department
+     **/
+    @GetMapping("/option")
+    @ResponseBody
+    public JSONResponse departmentByOption(@RequestParam String optionParams) {
+        // 判断必要参数是否为空
+        if (ParamUtil.isParamNull(optionParams)) {
+            return JSONResponseEnum.NULL_PARAM_RESPONSE.getResponseValue();
+        }
+        // 将optionParams转换为JSONObject
+        JSONObject optionJSONObject = JSONObject.parseObject(optionParams);
+        // 构建department对象
+        Department department = new Department();
+        // 获取id
+        Integer id = optionJSONObject.getInteger("id");
+        department.setId(id);
+        // 获取系名
+        String name = optionJSONObject.getString("name");
+        if (!ParamUtil.isParamNull(name)) {
+            department.setName(name);
+        }
+
+        ServiceResult serviceResult;
+        try {
+            serviceResult = departmentService.getDepartmentListByOption(department);
+        } catch (Exception ex) {
+            // 捕获异常并返回失败信息
+            ex.printStackTrace();
+            return JSONResponseEnum.DATABASE_ERROR_RESPONSE.getResponseValue();
+        }
+        // 获取状态码
+        Integer resultCode = serviceResult.getCode();
+        // 判断状态码
+        if (resultCode.equals(CodeEnum.SUCCESS.getCode())) {
+            // 获取department集合
+            List<Department> departments = ListUtil.castList(
+                    serviceResult.getData().get("departments"), Department.class);
+            // 返回响应
+            return JSONResponseEnum.SUCCESS_RESPONSE.getResponseValue().setData(departments);
+        } else if (resultCode.equals(CodeEnum.NULL_RESULT.getCode())) {
+            // 返回值为空状态
+            return JSONResponseEnum.NULL_RESULT_RESPONSE.getResponseValue();
+        }
+        // 其它错误
         return JSONResponseEnum.OTHER_ERROR_RESPONSE.getResponseValue();
     }
 }

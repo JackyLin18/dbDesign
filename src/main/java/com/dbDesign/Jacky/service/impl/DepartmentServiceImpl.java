@@ -1,5 +1,6 @@
 package com.dbDesign.Jacky.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.dbDesign.Jacky.common.enums.CodeEnum;
 import com.dbDesign.Jacky.mapper.DepartmentMapper;
 import com.dbDesign.Jacky.mapper.StudentMapper;
@@ -9,6 +10,7 @@ import com.dbDesign.Jacky.model.entity.Student;
 import com.dbDesign.Jacky.model.entity.Teacher;
 import com.dbDesign.Jacky.model.vo.ServiceResult;
 import com.dbDesign.Jacky.service.DepartmentService;
+import com.dbDesign.Jacky.util.ParamUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -51,19 +53,19 @@ public class DepartmentServiceImpl implements DepartmentService {
         if (department.getId() == null) {
             // 插入操作
             int insert = departmentMapper.insert(department);
-            if(insert > 0){
-                resultData.put("insert",insert);
+            if (insert > 0) {
+                resultData.put("insert", insert);
                 return ServiceResult.ok().setData(resultData);
-            }else{
+            } else {
                 return ServiceResult.fail();
             }
         } else {
             // 更新操作
             int update = departmentMapper.updateById(department);
-            if(update > 0){
-                resultData.put("update",update);
+            if (update > 0) {
+                resultData.put("update", update);
                 return ServiceResult.ok().setData(resultData);
-            }else{
+            } else {
                 return ServiceResult.fail(CodeEnum.NULL_RESULT);
             }
         }
@@ -74,7 +76,7 @@ public class DepartmentServiceImpl implements DepartmentService {
         // 根据departmentId查询出数据
         Department department = departmentMapper.selectById(id);
         // 判断查询结果是否为空
-        if(department == null){
+        if (department == null) {
             return ServiceResult.fail(CodeEnum.NULL_RESULT);
         }
         return ServiceResult.ok("department", department);
@@ -85,7 +87,7 @@ public class DepartmentServiceImpl implements DepartmentService {
         // 查询出指定studentId对应的student数据
         Student student = studentMapper.selectById(id);
         // 判断查询结果是否为空
-        if(student == null){
+        if (student == null) {
             return ServiceResult.fail(CodeEnum.NULL_RESULT);
         }
         // 获得查询得到的student对应的departmentId
@@ -93,7 +95,7 @@ public class DepartmentServiceImpl implements DepartmentService {
         // 查询出该departmentId对应的department
         Department department = departmentMapper.selectById(departmentId);
         // 判断查询结果是否为空
-        if(department == null){
+        if (department == null) {
             return ServiceResult.fail(CodeEnum.NULL_RESULT);
         }
         return ServiceResult.ok("department", department);
@@ -104,7 +106,7 @@ public class DepartmentServiceImpl implements DepartmentService {
         // 查询出指定teacherId对应的teacher数据
         Teacher teacher = teacherMapper.selectById(id);
         // 判断查询结果是否为空
-        if(teacher == null){
+        if (teacher == null) {
             return ServiceResult.fail(CodeEnum.NULL_RESULT);
         }
         // 获得查询出的teacher对应的departmentId
@@ -112,10 +114,31 @@ public class DepartmentServiceImpl implements DepartmentService {
         // 查询出该departmentId对应的department数据
         Department department = departmentMapper.selectById(departmentId);
         // 判断查询结果是否为空
-        if(department == null){
+        if (department == null) {
             return ServiceResult.fail(CodeEnum.NULL_RESULT);
         }
         return ServiceResult.ok("department", department);
+    }
+
+    @Override
+    public ServiceResult getDepartmentListByOption(Department department) {
+        // 获取各属性的值
+        Integer id = department.getId();
+        String name = department.getName();
+        // 构造条件查询器
+        QueryWrapper<Department> wrapper = new QueryWrapper<>();
+        if (id != null) {
+            wrapper.eq("id", id);
+        }
+        if (!ParamUtil.isParamNull(name)) {
+            wrapper.like("name", name);
+        }
+        // 查询满足条件的department集合
+        List<Department> departments = departmentMapper.selectList(wrapper);
+        if (departments.size() == 0) {
+            return ServiceResult.fail(CodeEnum.NULL_RESULT);
+        }
+        return ServiceResult.ok("departments", departments);
     }
 
     @Override
@@ -123,7 +146,7 @@ public class DepartmentServiceImpl implements DepartmentService {
         // 首先尝试查询出指定id的department数据
         Department department = departmentMapper.selectById(id);
         // 判断查询结果是否为空
-        if(department == null){
+        if (department == null) {
             return ServiceResult.fail(CodeEnum.NULL_RESULT);
         }
         // 执行逻辑删除

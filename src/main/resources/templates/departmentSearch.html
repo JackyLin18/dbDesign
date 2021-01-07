@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>搜索系别信息</title>
+    <script type="text/javascript" src="/dbDesign/js/jquery-3.4.1.js"></script>
+</head>
+<body>
+<h3>搜索条件</h3>
+系&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;号：<label for="id"></label><input id="id"/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+系&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;名：<label for="name"></label><input id="name"/><br/>
+<input type="button" onclick="departmentSearch()" value="搜索"/>
+<br/>
+<input type="button" style="position:absolute;top:10px;right:10px" onclick="window.history.back(-1)" value="返回主页">
+<table border="1">
+    <tbody id="departmentsBody">
+    </tbody>
+</table>
+<script type="text/javascript">
+    var departments;
+    $(function () {
+        $.ajax({
+            type: "GET",
+            url: 'department/all',
+            data: {},
+            success: function (data) {
+                showDepartments(data.data);
+            }
+        });
+    })
+</script>
+
+<script type="text/javascript">
+    function departmentSearch() {
+        $("#departmentsBody").html("");
+        var id = document.getElementById("id").value;
+        var name = document.getElementById("name").value;
+        // 搜索学院
+        var param = {
+            "id": id, "name": name
+        };
+        $.ajax({
+            type: "GET",
+            url: 'department/option',
+            data: {optionParams: JSON.stringify(param)},
+            datatype: "json",
+            success: function (data) {
+                if(data.status == true){
+                    showDepartments(data.data);
+                }
+            }
+        });
+    }
+
+    function showDepartments(departmentList) {
+        var tableData = "<tr align='center'>" +
+            "<td width='60'>系号</td>" +
+            "<td>系名</td>" +
+            "<td width='500'>系简介</td>" +
+            "</tr>";
+        for (var i = 0; i < departmentList.length; i++) {
+            tableData += "<tr align='center'>";
+            tableData += "<td>" + departmentList[i].id + "</td>";
+            tableData += "<td>" + departmentList[i].name + "</td>";
+            tableData += "<td>" + departmentList[i].introduction + "</td>";
+            tableData += "</tr>";
+        }
+        $("#departmentsBody").html(tableData);
+    }
+</script>
+</body>
+</html>

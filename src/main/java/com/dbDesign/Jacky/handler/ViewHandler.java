@@ -113,6 +113,11 @@ public class ViewHandler {
         return "courseSearch";
     }
 
+    @RequestMapping("/departmentSearch")
+    public String departmentSearch(){
+        return "departmentSearch";
+    }
+
     @RequestMapping("/courseDo")
     public String courseDo(HttpServletRequest request) {
         Administrator administrator = (Administrator)

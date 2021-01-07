@@ -17,6 +17,8 @@ public interface DepartmentService {
 
     ServiceResult getDepartmentByTeacherId(Integer id);
 
+    ServiceResult getDepartmentListByOption(Department department);
+
     ServiceResult remoteDepartmentById(Integer id);
 
     ServiceResult getDepartmentList();
