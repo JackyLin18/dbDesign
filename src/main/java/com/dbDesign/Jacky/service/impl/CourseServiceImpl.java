@@ -84,11 +84,11 @@ public class CourseServiceImpl implements CourseService {
     }
 
     @Override
-    public ServiceResult getCourseListByOption(Course course, Integer courseHoursType, Integer creditType) {
+    public ServiceResult getCourseListByOption(Course course, List<Integer> teacherIdList,
+                                               Integer courseHoursType, Integer creditType) {
         // 获取各个属性值
         Integer id = course.getId();
         String name = course.getName();
-        Integer teacherId = course.getTeacherId();
         Integer courseHours = course.getCourseHours();
         BigDecimal credit = course.getCredit();
         String classTime = course.getClassTime();
@@ -101,8 +101,8 @@ public class CourseServiceImpl implements CourseService {
         if (!ParamUtil.isParamNull(name)) {
             wrapper.like("name", name);
         }
-        if (teacherId != null) {
-            wrapper.eq("teacher_id", teacherId);
+        if (teacherIdList.size() != 0) {
+            wrapper.in("teacher_id", teacherIdList);
         }
         if (courseHours != null) {
             if (courseHoursType == 1) {

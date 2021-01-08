@@ -14,6 +14,8 @@ public interface TeacherService {
 
     ServiceResult getTeacherListByOption(Teacher teacher);
 
+    ServiceResult getTeacherIdListByName(String name);
+
     ServiceResult getAllTeacher();
 
     ServiceResult remoteTeacherByTeacherId(Integer id);

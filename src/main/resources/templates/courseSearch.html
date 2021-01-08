@@ -10,7 +10,9 @@
 <h3>搜索条件</h3>
 课&nbsp;&nbsp;程&nbsp;&nbsp;号：&nbsp;<label for="id"></label><input id="id"/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 课&nbsp;&nbsp;程&nbsp;&nbsp;名：<label for="name"></label><input id="name"/><br/>
-教师工号：&nbsp;<label for="teacher_id"></label><input id="teacher_id"/><br/>
+教师工号：&nbsp;<label for="teacher_id"></label><input id="teacher_id"/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+教师姓名：<label for="teacher_name"></label><input id="teacher_name"/><br/>
+<br/>
 学&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;时：&nbsp;<label for="course_hours"></label><input id="course_hours">学时
 <label for="course_hours_type"></label><select id="course_hours_type">
     <option value="1">以上</option>
@@ -48,6 +50,7 @@
         var id = $("#id").val();
         var name = $("#name").val();
         var teacher_id = $("#teacher_id").val();
+        var teacher_name = $("#teacher_name").val();
         var course_hours = $("#course_hours").val();
         var course_hours_type = document.getElementById("course_hours_type").value;
         var credit = $("#credit").val();
@@ -59,6 +62,7 @@
         var param = {
             "id": id, "name": name,
             "teacher_id": teacher_id,
+            "teacher_name": teacher_name,
             "course_hours": course_hours,
             "course_hours_type": course_hours_type,
             "credit": credit,

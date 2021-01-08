@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -113,6 +114,21 @@ public class TeacherServiceImpl implements TeacherService {
     }
 
     @Override
+    public ServiceResult getTeacherIdListByName(String name) {
+        QueryWrapper<Teacher> wrapper = new QueryWrapper<>();
+        wrapper.like("name", name);
+        List<Teacher> teachers = teacherMapper.selectList(wrapper);
+        ArrayList<Integer> idList = new ArrayList<>();
+        for (Teacher teacher : teachers) {
+            idList.add(teacher.getId());
+        }
+        if(idList.size() == 0){
+            return ServiceResult.fail(CodeEnum.NULL_RESULT);
+        }
+        return ServiceResult.ok("idList", idList);
+    }
+
+    @Override
     public ServiceResult remoteTeacherByTeacherId(Integer id) {
         // 从数据库中删除指定id的teacher
         int delete = teacherMapper.deleteById(id);
@@ -127,10 +143,10 @@ public class TeacherServiceImpl implements TeacherService {
     @Override
     public ServiceResult getAllTeacher() {
         List<Teacher> teachers = teacherMapper.selectList(null);
-        if(teachers.size() == 0){
+        if (teachers.size() == 0) {
             return ServiceResult.fail(CodeEnum.NULL_RESULT);
         }
-        return ServiceResult.ok("teachers",teachers);
+        return ServiceResult.ok("teachers", teachers);
     }
 
     @Override

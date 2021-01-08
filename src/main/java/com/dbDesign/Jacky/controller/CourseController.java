@@ -7,6 +7,7 @@ import com.dbDesign.Jacky.model.dto.JSONResponse;
 import com.dbDesign.Jacky.model.entity.Course;
 import com.dbDesign.Jacky.model.vo.ServiceResult;
 import com.dbDesign.Jacky.service.CourseService;
+import com.dbDesign.Jacky.service.TeacherService;
 import com.dbDesign.Jacky.service.intermediateService.StudentCourseService;
 import com.dbDesign.Jacky.util.ListUtil;
 import com.dbDesign.Jacky.util.ParamUtil;
@@ -19,6 +20,7 @@ import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -30,11 +32,17 @@ import java.util.List;
 @RequestMapping("/course")
 public class CourseController {
     private CourseService courseService;
+    private TeacherService teacherService;
     private StudentCourseService studentCourseService;
 
     @Autowired
     public void setCourseService(CourseService courseService) {
         this.courseService = courseService;
+    }
+
+    @Autowired
+    public void setTeacherService(TeacherService teacherService) {
+        this.teacherService = teacherService;
     }
 
     @Autowired
@@ -268,11 +276,55 @@ public class CourseController {
         if (!ParamUtil.isParamNull(classAddress)) {
             course.setClassAddress(classAddress);
         }
+        // 存放teacherName对应的id集合
+        List<Integer> teacherIdList = new ArrayList<>();
+        // 获取教师的姓名
+        String teacherName = optionJSONObject.getString("teacher_name");
+        // 判断是否有指定teacher的name
+        if (!ParamUtil.isParamNull(teacherName)) {
+            // 从数据库中查出指定姓名的教师id集合
+            ServiceResult teacherIdServiceResult;
+            try {
+                teacherIdServiceResult = teacherService.getTeacherIdListByName(teacherName);
+            } catch (Exception ex) {
+                // 捕获异常并返回失败信息
+                ex.printStackTrace();
+                return JSONResponseEnum.DATABASE_ERROR_RESPONSE.getResponseValue();
+            }
+            // 获取状态码
+            Integer resultCode = teacherIdServiceResult.getCode();
+            // 判断状态码
+            if (resultCode.equals(CodeEnum.SUCCESS.getCode())) {
+                // 获取id集合
+                teacherIdList = ListUtil.castList(teacherIdServiceResult.getData().get("idList"),
+                        Integer.class);
+            } else if (resultCode.equals(CodeEnum.NULL_RESULT.getCode())) {
+                // 返回值为空状态
+                return JSONResponseEnum.NULL_RESULT_RESPONSE.getResponseValue();
+            } else {
+                return JSONResponseEnum.OTHER_ERROR_RESPONSE.getResponseValue();
+            }
+
+            // 判断是否有指定teacher的id
+            if (teacherId != null) {
+                // 判断指定的teacherId是否在teacherName对应的idList中
+                if (!teacherIdList.contains(teacherId)) {
+                    return JSONResponseEnum.NULL_RESULT_RESPONSE.getResponseValue();
+                }
+            }
+        } else {
+            // 没有指定teacher的name
+            // 将指定的teacher存放入idList中
+            if (teacherId != null) {
+                teacherIdList.add(teacherId);
+            }
+        }
 
         ServiceResult serviceResult;
         try {
             // 查询满足条件的course集合
-            serviceResult = courseService.getCourseListByOption(course, courseHoursType, creditType);
+            serviceResult = courseService.getCourseListByOption(course, teacherIdList,
+                    courseHoursType, creditType);
         } catch (Exception ex) {
             // 捕获异常并返回失败状态
             ex.printStackTrace();
