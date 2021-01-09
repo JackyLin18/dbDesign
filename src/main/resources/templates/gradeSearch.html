@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>搜索成绩信息</title>
+    <script type="text/javascript" src="/dbDesign/js/jquery-3.4.1.js"></script>
+</head>
+<body>
+<h3>搜索条件</h3>
+课&nbsp;&nbsp;程&nbsp;&nbsp;号：<label for="course_id"></label><input id="course_id"/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+课&nbsp;&nbsp;程&nbsp;&nbsp;名：<label for="course_name"></label><input id="course_name"/><br/>
+学生学号：<label for="student_id"></label><input id="student_id"/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+学生姓名：<label for="student_name"></label><input id="student_name"/><br/>
+教师姓名：<label for="teacher_name"></label><input id="teacher_name"/><br/>
+学院编号：<label for="department_id"></label><input id="department_id"/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<br/>
+
+<input type="button" onclick="courseSearch()" value="搜索"/>
+<input type="button"
+       onclick="window.location.href='administratorMain'" value="返回主页">
+<br/>
+<table border="1">
+    <tbody id="gradeBody">
+    </tbody>
+</table>
+
+<script type="text/javascript">
+    function courseSearch() {
+        $("#gradeBody").html("");
+
+        var course_id = $("#course_id").val();
+        var course_name = $("#course_name").val();
+        var student_id = $("#student_id").val();
+        var student_name = $("#student_name").val();
+        var teacher_name = $("#teacher_name").val();
+        var department_id = $("#department_id").val();
+
+        // 搜索课程
+        var param = {
+            "course_id": course_id,
+            "course_name": course_name,
+            "student_id": student_id,
+            "student_name": student_name,
+            "teacher_name": teacher_name,
+            "department_id": department_id
+        };
+        $.ajax({
+            type: "GET",
+            url: 'grade/option',
+            data: {optionParams: JSON.stringify(param)},
+            datatype: "json",
+            success: function (data) {
+                console.log(data);
+                showGrades(data.data);
+            }
+        });
+    }
+
+    var departments;
+
+    function showGrades(gradeList) {
+        var tableData = "<tr align='center'>" +
+            "<td>课程号</td>" +
+            "<td width='120'>课程名</td>" +
+            "<td>学生学号</td>" +
+            "<td>学生姓名</td>" +
+            "<td>任课老师</td>" +
+            "<td>学分</td>" +
+            "<td>学时</td>" +
+            "<td width='200'>上课时间</td>" +
+            "<td width='80'>上课地点</td>" +
+            "<td width='160'>考试时间</td>" +
+            "<td>学院</td>" +
+            "<td>平时成绩</td>" +
+            "<td>考试成绩</td>" +
+            "<td>总评成绩</td>" +
+            "</tr>";
+        var flag = true;
+        for (var i = 0; i < gradeList.length; i++) {
+            if (i > 0 && gradeList[i].courseId != gradeList[i - 1].courseId) {
+                flag = !flag;
+            }
+            if (flag) {
+                tableData += "<tr align='center'>";
+            } else {
+                tableData += "<tr align='center' style='background: aquamarine'>";
+            }
+            tableData += "<td>" + gradeList[i].courseId + "</td>";
+            tableData += "<td>" + gradeList[i].courseName + "</td>";
+            tableData += "<td>" + gradeList[i].studentId + "</td>";
+            tableData += "<td>" + gradeList[i].studentName + "</td>";
+            tableData += "<td>" + gradeList[i].teacherName + "</td>";
+            tableData += "<td>" + gradeList[i].credit + "</td>";
+            tableData += "<td>" + gradeList[i].courseHours + "</td>";
+            tableData += "<td>" + gradeList[i].classTime + "</td>";
+            tableData += "<td>" + gradeList[i].classAddress + "</td>";
+            tableData += "<td>" + getLocalTime(gradeList[i].examTime) + "</td>";
+            tableData += "<td>" + getDepartmentName(gradeList[i].departmentId) + "</td>";
+            tableData += "<td>" + gradeList[i].usualGrade + "</td>";
+            tableData += "<td>" + gradeList[i].examGrade + "</td>";
+            tableData += "<td>" + gradeList[i].totalGrade + "</td>";
+            tableData += "</tr>";
+        }
+        $("#gradeBody").html(tableData);
+    }
+
+    function getLocalTime(timeStamp) {
+        var dataee = new Date(timeStamp).toJSON();
+        return new Date(+new Date(dataee)).toLocaleString().replace(/:\d{1,2}$/, ' ');
+    }
+
+    function getDepartmentName(departmentId) {
+        for (var i = 0; i < departments.length; i++) {
+            if (departments[i].id == departmentId) {
+                return departments[i].name;
+            }
+        }
+    }
+</script>
+
+<script>
+    $(function () {
+        $.ajax({
+            type: "GET",
+            url: 'department/all',
+            data: {},
+            success: function (data) {
+                departments = data.data;
+            }
+        });
+    });
+</script>
+</body>
+</html>

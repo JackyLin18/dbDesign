@@ -226,4 +226,14 @@ public class ViewHandler {
         }
         return "allDepartmentList";
     }
+
+    @RequestMapping("/gradeSearch")
+    public String gradeSearch(HttpServletRequest request){
+        Administrator administrator = (Administrator)
+                request.getSession().getAttribute("administrator");
+        if (administrator == null) {
+            return "login";
+        }
+        return "gradeSearch";
+    }
 }
