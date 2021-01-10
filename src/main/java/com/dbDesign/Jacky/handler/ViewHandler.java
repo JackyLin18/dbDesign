@@ -17,7 +17,7 @@ import javax.servlet.http.HttpSession;
  **/
 @Controller
 public class ViewHandler {
-    @RequestMapping(value = {"/login","/index","/"})
+    @RequestMapping(value = {"/login", "/index", "/"})
     public String login() {
         return "login";
     }
@@ -114,7 +114,7 @@ public class ViewHandler {
     }
 
     @RequestMapping("/departmentSearch")
-    public String departmentSearch(){
+    public String departmentSearch() {
         return "departmentSearch";
     }
 
@@ -228,12 +228,22 @@ public class ViewHandler {
     }
 
     @RequestMapping("/gradeSearch")
-    public String gradeSearch(HttpServletRequest request){
+    public String gradeSearch(HttpServletRequest request) {
         Administrator administrator = (Administrator)
                 request.getSession().getAttribute("administrator");
         if (administrator == null) {
             return "login";
         }
         return "gradeSearch";
+    }
+
+    @RequestMapping("/gradeReportList")
+    public String gradeReportList(HttpServletRequest request) {
+        Administrator administrator = (Administrator)
+                request.getSession().getAttribute("administrator");
+        if (administrator == null) {
+            return "login";
+        }
+        return "gradeReportList";
     }
 }

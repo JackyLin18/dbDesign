@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>搜索成绩信息</title>
+    <script type="text/javascript" src="/dbDesign/js/jquery-3.4.1.js"></script>
+</head>
+<body>
+搜索类型：按
+<label for="optionType"></label><select id="optionType" style="width: 90px">
+    <option value="1">全部</option>
+    <option value="2">课程号</option>
+    <option value="3">课程名</option>
+    <option value="4">教师职工号</option>
+    <option value="5">教师名</option>
+    <option value="6">学院系号</option>
+</select>搜索<br/>
+关&nbsp;&nbsp;键&nbsp;&nbsp;词：<label for="option"></label><input id="option" style="width: 90px"/>
+<input type="button" onclick="gradeReportSearch()" value="搜索"/><br>
+<input type="button"
+       onclick="window.location.href='administratorMain'" value="返回主页">
+<br/>
+
+<div id="dataDiv"></div>
+
+<script type="text/javascript">
+    var tempOptionType = -1;
+    var tempOptionKey = "";
+    function gradeReportSearch() {
+        courseFlag = -1;
+        var optionType = document.getElementById("optionType").value;
+        if (optionType == 1) {
+            if(tempOptionType == optionType){
+                return;
+            }
+            tempOptionType = optionType;
+            tempOptionKey = "";
+            $.ajax({
+                type: "GET",
+                url: "course/all",
+                success: function (data) {
+                    $("#dataDiv").html("");
+                    showCourses(data.data);
+                }
+            });
+        }
+        if (optionType == 2) {
+            var courseId = $("#option").val();
+            if(tempOptionType == optionType && tempOptionKey === courseId){
+                return;
+            }
+            tempOptionType = optionType;
+            tempOptionKey = courseId;
+            $.ajax({
+                type: "GET",
+                url: "course?id=" + courseId,
+                success: function (data) {
+                    var course = data.data;
+                    $("#dataDiv").html("");
+                    showCourse(course);
+                    getStudentBaseByCourseId(course.id);
+                    getGradeReportsByCourseId(course.id);
+                }
+            });
+        }
+        if (optionType == 3) {
+            var courseName = $("#option").val();
+            if(tempOptionType == optionType && tempOptionKey === courseName){
+                return;
+            }
+            tempOptionType = optionType;
+            tempOptionKey = courseName;
+            $.ajax({
+                type: "GET",
+                url: "course/courseName?courseName=" + courseName,
+                success: function (data) {
+                    $("#dataDiv").html("");
+                    showCourses(data.data);
+                }
+            });
+        }
+        if (optionType == 4) {
+            var teacherId = $("#option").val();
+            if(tempOptionType == optionType && tempOptionKey === teacherId){
+                return;
+            }
+            tempOptionType = optionType;
+            tempOptionKey = teacherId;
+            $.ajax({
+                type: "GET",
+                url: "course/teacher?teacherId=" + teacherId,
+                success: function (data) {
+                    $("#dataDiv").html("");
+                    showCourses(data.data);
+                }
+            });
+        }
+        if (optionType == 5) {
+            var teacherName = $("#option").val();
+            if(tempOptionType == optionType && tempOptionKey === teacherName){
+                return;
+            }
+            tempOptionType = optionType;
+            tempOptionKey = teacherName;
+            $.ajax({
+                type: "GET",
+                url: "course/teacherName?teacherName=" + teacherName,
+                success: function (data) {
+                    $("#dataDiv").html("");
+                    showCourses(data.data);
+                }
+            });
+        }
+        if (optionType == 6) {
+            var departmentId = $("#option").val();
+            if(tempOptionType == optionType && tempOptionKey === departmentId){
+                return;
+            }
+            tempOptionType = optionType;
+            tempOptionKey = departmentId;
+            $.ajax({
+                type: "GET",
+                url: "course/departmentId?departmentId=" + departmentId,
+                success: function (data) {
+                    $("#dataDiv").html("");
+                    showCourses(data.data);
+                }
+            });
+        }
+    }
+
+    var departments;
+
+    function showCourses(courseList) {
+        for (var i = 0; i < courseList.length; i++) {
+            showCourse(courseList[i]);
+        }
+        showGradeReports(courseList)
+    }
+
+    function showGradeReports(courseList) {
+        var courseIdList = [];
+        for (var i = 0; i < courseList.length; i++) {
+            courseIdList.push(courseList[i].id);
+        }
+        getStudentBaseByCourseIdList(courseIdList);
+        getGradeReportsByCourseIdList(courseIdList);
+    }
+
+    function getStudentBaseByCourseId(courseId) {
+        var courseIdList = [];
+        courseIdList.push(courseId);
+        getStudentBaseByCourseIdList(courseIdList);
+    }
+
+    function getStudentBaseByCourseIdList(courseIdList) {
+        var param = {"idList": courseIdList};
+        $.ajax({
+            url: "chooseCourse/courseIdList",
+            type: "GET",
+            data: {param: JSON.stringify(param)},
+            datatype: "json",
+            success: function (data) {
+                console.log(data.data);
+                var studentBaseList = data.data;
+                for (var j = 0; j < studentBaseList.length; j++) {
+                    showStudentBase(studentBaseList[j]);
+                }
+            }
+        })
+    }
+
+    function getGradeReportsByCourseId(courseId) {
+        var courseIdList = [];
+        courseIdList.push(courseId);
+        getGradeReportsByCourseIdList(courseIdList);
+    }
+
+    function getGradeReportsByCourseIdList(courseIdList) {
+        var param = {"idList": courseIdList};
+        $.ajax({
+            url: "gradeReport/courseIdList",
+            type: "GET",
+            data: {param: JSON.stringify(param)},
+            datatype: "json",
+            success: function (data) {
+                console.log(data.data);
+                var gradeReports = data.data;
+                for (var j = 0; j < gradeReports.length; j++) {
+                    showGradeReport(gradeReports[j]);
+                }
+            }
+        })
+    }
+
+    function showCourse(course) {
+        var tableId = "courseTable" + course.id;
+        var tableData = "课程" + course.id + "的基本信息:"
+        tableData += "<table id='" + tableId + "' border='1'><tr align='center'>" +
+            "<td>课程号</td>" +
+            "<td width='120'>课程名</td>" +
+            "<td>教师工号</td>" +
+            "<td>学时</td>" +
+            "<td>学分</td>" +
+            "<td width='200'>上课时间</td>" +
+            "<td width='120'>上课地点</td>" +
+            "<td width='200'>考试时间</td>" +
+            "</tr>";
+        tableData += "<tr align='center'>";
+        tableData += "<td>" + course.id + "</td>";
+        tableData += "<td>" + course.name + "</td>";
+        tableData += "<td>" + course.teacherId + "</td>";
+        tableData += "<td>" + course.courseHours + "</td>";
+        tableData += "<td>" + course.credit + "</td>";
+        tableData += "<td>" + course.classTime + "</td>";
+        tableData += "<td>" + course.classAddress + "</td>";
+        tableData += "<td>" + getLocalTime(course.examTime) + "</td>";
+        tableData += "</tr></table>";
+        $("#dataDiv").append(tableData);
+    }
+
+    var courseFlag = -1;
+
+    function showStudentBase(studentBase) {
+        var courseId = studentBase.courseId;
+        var studentBaseTableId = "#studentBase" + courseId;
+        var courseTableId = "#courseTable" + courseId;
+        var tableData = "";
+        if (courseFlag != courseId) {
+            tableData += "课程" + courseId + "的选修学生:";
+            tableData += "<table border='1' id='studentBase" + courseId + "'><tr align='center'>" +
+                "<td width='60'>学号</td>" +
+                "<td width='100'>姓名</td>" +
+                "<td width='60'>性别</td>" +
+                "<td width='90'>平时成绩</td>" +
+                "<td width='90'>考试成绩</td>" +
+                "<td width='90'>总评成绩</td>" +
+                "</tr>";
+        }
+        tableData += "<tr align='center'>";
+        tableData += "<td>" + studentBase.studentId + "</td>";
+        tableData += "<td>" + studentBase.studentName + "</td>";
+        var sex = '未知';
+        if (studentBase.sex == 1) {
+            sex = '男';
+        } else if (studentBase.sex == 2) {
+            sex = '女';
+        }
+        tableData += "<td>" + sex + "</td>";
+        tableData += "<td>" + studentBase.usualGrade + "</td>";
+        tableData += "<td>" + studentBase.examGrade + "</td>";
+        tableData += "<td>" + studentBase.totalGrade + "</td>";
+        tableData += "</tr>";
+        if (courseFlag != courseId) {
+            tableData += "</table>";
+            $(courseTableId).after(tableData);
+        } else {
+            $(studentBaseTableId).append(tableData);
+        }
+        courseFlag = courseId;
+    }
+
+    function showGradeReport(gradeReport) {
+        var courseTableId = "#courseTable" + gradeReport.courseId;
+        var tableData = "课程" + gradeReport.courseId + "的成绩分布:";
+        tableData += "<table border='1'><tr align='center'>" +
+            "<td width='45'>选修人数</td>" +
+            "<td width='85'>不及格人数</td>" +
+            "<td width='85'>不及格比例</td>" +
+            "<td width='73'>及格人数</td>" +
+            "<td width='73'>及格比例</td>" +
+            "<td width='73'>中等人数</td>" +
+            "<td width='73'>中等比例</td>" +
+            "<td width='73'>良好人数</td>" +
+            "<td width='73'>良好比例</td>" +
+            "<td width='73'>优秀人数</td>" +
+            "<td width='73'>优秀比例</td>" +
+            "</tr>";
+        tableData += "<tr align='center'>";
+        tableData += "<td>" + gradeReport.count + "</td>";
+        tableData += "<td>" + gradeReport.fail + "</td>";
+        tableData += "<td>" + gradeReport.failPre + "</td>";
+        tableData += "<td>" + gradeReport.pass + "</td>";
+        tableData += "<td>" + gradeReport.passPre + "</td>";
+        tableData += "<td>" + gradeReport.medium + "</td>";
+        tableData += "<td>" + gradeReport.mediumPre + "</td>";
+        tableData += "<td>" + gradeReport.good + "</td>";
+        tableData += "<td>" + gradeReport.goodPre + "</td>";
+        tableData += "<td>" + gradeReport.excellent + "</td>";
+        tableData += "<td>" + gradeReport.excellentPre + "</td>";
+        tableData += "</tr></table>";
+        $(courseTableId).after(tableData);
+    }
+
+    function getLocalTime(timeStamp) {
+        var dataee = new Date(timeStamp).toJSON();
+        return new Date(+new Date(dataee)).toLocaleString().replace(/:\d{1,2}$/, ' ');
+    }
+</script>
+</body>
+</html>

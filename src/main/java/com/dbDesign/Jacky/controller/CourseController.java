@@ -223,6 +223,61 @@ public class CourseController {
         return JSONResponseEnum.OTHER_ERROR_RESPONSE.getResponseValue();
     }
 
+    @GetMapping(value = "/teacherName")
+    @ResponseBody
+    public JSONResponse courseByTeacherName(@RequestParam String teacherName) {
+        ServiceResult serviceResult;
+        try {
+            // 获取指定teacherName授课的course集合
+            serviceResult = courseService.getCourseListByTeacherName(teacherName);
+        } catch (Exception ex) {
+            // 捕获异常并返回失败状态
+            ex.printStackTrace();
+            return JSONResponseEnum.DATABASE_ERROR_RESPONSE.getResponseValue();
+        }
+        // 获取状态码
+        Integer resultCode = serviceResult.getCode();
+        // 判断状态码
+        if (resultCode.equals(CodeEnum.SUCCESS.getCode())) {
+            // 成功状态
+            List<Course> courses = ListUtil.castList(
+                    serviceResult.getData().get("courses"), Course.class);
+            // 返回响应
+            return JSONResponseEnum.SUCCESS_RESPONSE.getResponseValue().setData(courses);
+        } else if (resultCode.equals(CodeEnum.NULL_RESULT.getCode())) {
+            // 返回值为空状态
+            return JSONResponseEnum.NULL_RESULT_RESPONSE.getResponseValue();
+        }
+        return JSONResponseEnum.OTHER_ERROR_RESPONSE.getResponseValue();
+    }
+
+    @GetMapping(value = "/departmentId")
+    @ResponseBody
+    public JSONResponse courseByDepartmentId(@RequestParam Integer departmentId) {
+        ServiceResult serviceResult;
+        try {
+            serviceResult = courseService.getCourseListByDepartmentId(departmentId);
+        } catch (Exception ex) {
+            // 捕获异常并返回失败状态
+            ex.printStackTrace();
+            return JSONResponseEnum.DATABASE_ERROR_RESPONSE.getResponseValue();
+        }
+        // 获取状态码
+        Integer resultCode = serviceResult.getCode();
+        // 判断状态码
+        if (resultCode.equals(CodeEnum.SUCCESS.getCode())) {
+            // 成功状态
+            List<Course> courses = ListUtil.castList(
+                    serviceResult.getData().get("courses"), Course.class);
+            // 返回响应
+            return JSONResponseEnum.SUCCESS_RESPONSE.getResponseValue().setData(courses);
+        } else if (resultCode.equals(CodeEnum.NULL_RESULT.getCode())) {
+            // 返回值为空状态
+            return JSONResponseEnum.NULL_RESULT_RESPONSE.getResponseValue();
+        }
+        return JSONResponseEnum.OTHER_ERROR_RESPONSE.getResponseValue();
+    }
+
     /**
      * @Author Jacky
      * @Param optionParams 指定的查询条件
@@ -397,6 +452,33 @@ public class CourseController {
             serviceResult = studentCourseService.getCourseListByStudentId(studentId);
         } catch (Exception ex) {
             // 捕获异常并返回失败状态
+            ex.printStackTrace();
+            return JSONResponseEnum.DATABASE_ERROR_RESPONSE.getResponseValue();
+        }
+        // 获取状态码
+        Integer resultCode = serviceResult.getCode();
+        // 判断状态码
+        if (resultCode.equals(CodeEnum.SUCCESS.getCode())) {
+            // 成功
+            // 获取course集合
+            List<Course> courses = ListUtil.castList(
+                    serviceResult.getData().get("courses"), Course.class);
+            // 返回响应
+            return JSONResponseEnum.SUCCESS_RESPONSE.getResponseValue().setData(courses);
+        } else if (resultCode.equals(CodeEnum.NULL_RESULT.getCode())) {
+            return JSONResponseEnum.NULL_RESULT_RESPONSE.getResponseValue();
+        }
+        return JSONResponseEnum.OTHER_ERROR_RESPONSE.getResponseValue();
+    }
+
+    @GetMapping("/courseName")
+    @ResponseBody
+    public JSONResponse coursesByCourseName(@RequestParam String courseName){
+        ServiceResult serviceResult;
+        try{
+            serviceResult = courseService.getCourseByCourseName(courseName);
+        }catch (Exception ex){
+            // 捕获异常并返回失败信息
             ex.printStackTrace();
             return JSONResponseEnum.DATABASE_ERROR_RESPONSE.getResponseValue();
         }

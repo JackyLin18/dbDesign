@@ -10,7 +10,13 @@ public interface CourseService {
 
     ServiceResult getCourseByCourseId(Integer courseId);
 
+    ServiceResult getCourseByCourseName(String courseName);
+
     ServiceResult getCourseListByTeacherId(Integer teacherId);
+
+    ServiceResult getCourseListByTeacherName(String teacherName);
+
+    ServiceResult getCourseListByDepartmentId(Integer departmentId);
 
     ServiceResult getCourseListByOption(Course course, List<Integer> teacherIdList,
                                         Integer courseHoursType, Integer creditType);

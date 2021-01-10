@@ -4,7 +4,9 @@ import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.dbDesign.Jacky.common.enums.CodeEnum;
 import com.dbDesign.Jacky.mapper.CourseMapper;
+import com.dbDesign.Jacky.mapper.TeacherMapper;
 import com.dbDesign.Jacky.model.entity.Course;
+import com.dbDesign.Jacky.model.entity.Teacher;
 import com.dbDesign.Jacky.model.vo.ServiceResult;
 import com.dbDesign.Jacky.service.CourseService;
 import com.dbDesign.Jacky.util.ParamUtil;
@@ -13,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -25,10 +28,16 @@ import java.util.List;
 @Transactional
 public class CourseServiceImpl implements CourseService {
     private CourseMapper courseMapper;
+    private TeacherMapper teacherMapper;
 
     @Autowired
     public void setCourseMapper(CourseMapper courseMapper) {
         this.courseMapper = courseMapper;
+    }
+
+    @Autowired
+    public void setTeacherMapper(TeacherMapper teacherMapper) {
+        this.teacherMapper = teacherMapper;
     }
 
     @Override
@@ -70,6 +79,18 @@ public class CourseServiceImpl implements CourseService {
     }
 
     @Override
+    public ServiceResult getCourseByCourseName(String courseName) {
+        QueryWrapper<Course> wrapper = new QueryWrapper<>();
+        wrapper.like("name", courseName);
+        List<Course> courses = courseMapper.selectList(wrapper);
+        // 判断返回结果是否为空
+        if (courses.size() == 0) {
+            return ServiceResult.fail(CodeEnum.NULL_RESULT);
+        }
+        return ServiceResult.ok("courses", courses);
+    }
+
+    @Override
     public ServiceResult getCourseListByTeacherId(Integer teacherId) {
         // 构建条件查询器
         QueryWrapper<Course> wrapper = new QueryWrapper<>();
@@ -77,6 +98,48 @@ public class CourseServiceImpl implements CourseService {
         // 查询出符合条件的course集合
         List<Course> courses = courseMapper.selectList(wrapper);
         // 判断返回结果是否为空
+        if (courses.size() == 0) {
+            return ServiceResult.fail(CodeEnum.NULL_RESULT);
+        }
+        return ServiceResult.ok("courses", courses);
+    }
+
+    @Override
+    public ServiceResult getCourseListByTeacherName(String teacherName) {
+        QueryWrapper<Teacher> teacherQueryWrapper = new QueryWrapper<>();
+        teacherQueryWrapper.like("name", teacherName);
+        List<Teacher> teachers = teacherMapper.selectList(teacherQueryWrapper);
+        if (teachers.size() == 0) {
+            return ServiceResult.fail(CodeEnum.NULL_RESULT);
+        }
+        List<Integer> teacherIdList = new ArrayList<>();
+        for (Teacher teacher : teachers) {
+            teacherIdList.add(teacher.getId());
+        }
+        QueryWrapper<Course> wrapper = new QueryWrapper<>();
+        wrapper.in("teacher_id", teacherIdList);
+        List<Course> courses = courseMapper.selectList(wrapper);
+        if (courses.size() == 0) {
+            return ServiceResult.fail(CodeEnum.NULL_RESULT);
+        }
+        return ServiceResult.ok("courses", courses);
+    }
+
+    @Override
+    public ServiceResult getCourseListByDepartmentId(Integer departmentId) {
+        QueryWrapper<Teacher> teacherQueryWrapper = new QueryWrapper<>();
+        teacherQueryWrapper.eq("department_id", departmentId);
+        List<Teacher> teachers = teacherMapper.selectList(teacherQueryWrapper);
+        if (teachers.size() == 0) {
+            return ServiceResult.fail(CodeEnum.NULL_RESULT);
+        }
+        List<Integer> teacherIdList = new ArrayList<>();
+        for (Teacher teacher : teachers) {
+            teacherIdList.add(teacher.getId());
+        }
+        QueryWrapper<Course> wrapper = new QueryWrapper<>();
+        wrapper.in("teacher_id", teacherIdList);
+        List<Course> courses = courseMapper.selectList(wrapper);
         if (courses.size() == 0) {
             return ServiceResult.fail(CodeEnum.NULL_RESULT);
         }
