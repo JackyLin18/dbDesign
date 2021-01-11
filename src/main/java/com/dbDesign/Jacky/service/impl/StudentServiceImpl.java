@@ -2,11 +2,9 @@ package com.dbDesign.Jacky.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.dbDesign.Jacky.common.enums.CodeEnum;
-import com.dbDesign.Jacky.mapper.StudentHistoryMapper;
 import com.dbDesign.Jacky.mapper.StudentMapper;
 import com.dbDesign.Jacky.mapper.intermediateMapper.StudentCourseMapper;
 import com.dbDesign.Jacky.model.entity.Student;
-import com.dbDesign.Jacky.model.entity.StudentHistory;
 import com.dbDesign.Jacky.model.vo.ServiceResult;
 import com.dbDesign.Jacky.service.StudentService;
 import com.dbDesign.Jacky.util.ParamUtil;
@@ -27,7 +25,6 @@ import java.util.List;
 public class StudentServiceImpl implements StudentService {
     private StudentMapper studentMapper;
     private StudentCourseMapper studentCourseMapper;
-    private StudentHistoryMapper studentHistoryMapper;
 
     @Autowired
     public void setStudentMapper(StudentMapper studentMapper) {
@@ -37,11 +34,6 @@ public class StudentServiceImpl implements StudentService {
     @Autowired
     public void setStudentCourseMapper(StudentCourseMapper studentCourseMapper) {
         this.studentCourseMapper = studentCourseMapper;
-    }
-
-    @Autowired
-    public void setStudentHistoryMapper(StudentHistoryMapper studentHistoryMapper) {
-        this.studentHistoryMapper = studentHistoryMapper;
     }
 
     @Override
@@ -154,47 +146,16 @@ public class StudentServiceImpl implements StudentService {
     @Override
     public ServiceResult getAllStudentList() {
         List<Student> students = studentMapper.selectList(null);
-        if(students.size() == 0){
+        if (students.size() == 0) {
             return ServiceResult.fail(CodeEnum.NULL_RESULT);
         }
-        return ServiceResult.ok("students",students);
+        return ServiceResult.ok("students", students);
     }
 
     @Override
     public ServiceResult remoteStudentByStudentId(Integer studentId, Integer reason) {
-        // 查询出指定studentId的student数据
-        Student student = studentMapper.selectAllMessageByStudentId(studentId);
-        // 判断结果是否为空
-        if (student == null) {
-            return ServiceResult.fail(CodeEnum.NULL_RESULT);
-        }
-        // 向下转换为studentHistory对象
-        StudentHistory studentHistory = new StudentHistory();
-        studentHistory.setId(student.getId());
-        studentHistory.setPassword(student.getPassword());
-        studentHistory.setName(student.getName());
-        studentHistory.setSex(student.getSex());
-        studentHistory.setBirthday(student.getBirthday());
-        studentHistory.setEnrolledScore(student.getEnrolledScore());
-        studentHistory.setDepartmentId(student.getDepartmentId());
-        studentHistory.setReason(reason);
-        // 向数据库中插入studentHistory
-        int insert = studentHistoryMapper.insert(studentHistory);
-        // 判断是否插入成功
-        if (insert > 0) {
-            // 插入成功
-            // 将student数据从数据库中删除
-            int delete = studentMapper.deleteById(studentId);
-            if (delete > 0) {
-                // 删除成功
-                return ServiceResult.ok();
-            } else {
-                // 删除失败，删除studentHistory
-                studentHistoryMapper.deleteById(studentId);
-            }
-        }
-        // 插入失败
-        return ServiceResult.fail();
+        studentMapper.deleteStudentByProcedure(studentId, reason);
+        return ServiceResult.ok();
     }
 
     @Override

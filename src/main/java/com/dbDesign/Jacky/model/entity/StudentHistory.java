@@ -1,9 +1,7 @@
 package com.dbDesign.Jacky.model.entity;
 
 import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableLogic;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -19,9 +17,6 @@ public class StudentHistory extends Student {
     private Integer id;
     // 原因（0为未知，1为转学，2为毕业，3为退学）
     private Integer reason;
-    @TableLogic
-    @TableField(select = false)
-    private Integer deleted;
 
     public StudentHistory() {
 

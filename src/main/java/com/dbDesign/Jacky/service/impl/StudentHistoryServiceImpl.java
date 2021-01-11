@@ -32,10 +32,10 @@ public class StudentHistoryServiceImpl implements StudentHistoryService {
         QueryWrapper<StudentHistory> wrapper = new QueryWrapper<>();
         wrapper.orderByAsc("reason");
         List<StudentHistory> studentHistories = studentHistoryMapper.selectList(wrapper);
-        if(studentHistories.size() == 0){
+        if (studentHistories.size() == 0) {
             return ServiceResult.fail(CodeEnum.NULL_RESULT);
         }
-        return ServiceResult.ok("studentHistories",studentHistories);
+        return ServiceResult.ok("studentHistories", studentHistories);
     }
 
     @Override
@@ -65,7 +65,7 @@ public class StudentHistoryServiceImpl implements StudentHistoryService {
 
     @Override
     public ServiceResult remoteStudentHistoryByStudentId(Integer studentId) {
-        studentHistoryMapper.deleteByIdWithFill(new StudentHistory(studentId));
+//        studentHistoryMapper.deleteByIdWithFill(new StudentHistory(studentId));
         return ServiceResult.ok();
     }
 }

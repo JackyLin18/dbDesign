@@ -14,10 +14,10 @@ import org.springframework.stereotype.Repository;
 @Repository
 @Mapper
 public interface StudentHistoryMapper extends BaseMapper<StudentHistory> {
-    /**
-     * @Author Jacky
-     * @Param studentHistory 需要逻辑删除的学生历史记录
-     * @Description 逻辑删除指定的 studentHistory
-     **/
-    void deleteByIdWithFill(StudentHistory studentHistory);
+//    /**
+//     * @Author Jacky
+//     * @Param studentHistory 需要逻辑删除的学生历史记录
+//     * @Description 逻辑删除指定的 studentHistory
+//     **/
+//    void deleteByIdWithFill(StudentHistory studentHistory);
 }
