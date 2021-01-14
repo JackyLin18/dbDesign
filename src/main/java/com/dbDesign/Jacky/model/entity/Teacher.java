@@ -1,9 +1,6 @@
 package com.dbDesign.Jacky.model.entity;
 
-import com.baomidou.mybatisplus.annotation.FieldFill;
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.*;
 import lombok.Data;
 
 import java.sql.Date;
@@ -15,6 +12,7 @@ import java.sql.Timestamp;
  * @Description
  **/
 @Data
+@TableName("teacher_5062")
 public class Teacher {
     // 教职工号
     @TableId(type = IdType.AUTO)

@@ -9,6 +9,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 @Mapper
 public interface TeacherMapper extends BaseMapper<Teacher> {
-    @Select(value = "select password from teacher where id = #{teacherId}")
+    @Select(value = "select password from teacher_5062 where id = #{teacherId}")
     String selectPasswordByTeacherId(Integer teacherId);
 }

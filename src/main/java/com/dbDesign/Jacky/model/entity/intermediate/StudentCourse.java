@@ -1,9 +1,6 @@
 package com.dbDesign.Jacky.model.entity.intermediate;
 
-import com.baomidou.mybatisplus.annotation.FieldFill;
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.*;
 import lombok.Data;
 
 import java.math.BigDecimal;
@@ -15,6 +12,7 @@ import java.sql.Timestamp;
  * @Description
  **/
 @Data
+@TableName("student_course_5062")
 public class StudentCourse {
     // 学生id
     @TableId(type = IdType.INPUT)

@@ -11,6 +11,7 @@ import java.sql.Timestamp;
  * @Description
  **/
 @Data
+@TableName("department_5062")
 public class Department {
     // 系号
     @TableId(type = IdType.AUTO)

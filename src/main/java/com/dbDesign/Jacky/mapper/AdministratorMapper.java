@@ -9,6 +9,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 @Mapper
 public interface AdministratorMapper extends BaseMapper<Administrator> {
-    @Select(value = "select password from administrator where id = #{administratorId}")
+    @Select(value = "select password from administrator_5062 where id = #{administratorId}")
     String selectPasswordByAdministratorId(Integer administratorId);
 }

@@ -88,7 +88,6 @@
             "<td width='60'>学号</td>" +
             "<td width='60'>姓名</td>" +
             "<td width='60'>性别</td>" +
-            "<td width='100'>出生日期</td>" +
             "<td width='80'>入学成绩</td>" +
             "<td>学院</td>" +
             "</tr>";
@@ -97,7 +96,6 @@
             tableData += "<td>" + studentList[i].id + "</td>";
             tableData += "<td>" + studentList[i].name + "</td>";
             tableData += "<td>" + (studentList[i].sex == 0 ? '未知' : (studentList[i].sex == 1 ? '男' : '女')) + "</td>";
-            tableData += "<td>" + studentList[i].birthday + "</td>";
             tableData += "<td>" + studentList[i].enrolledScore + "分" + "</td>";
             tableData += "<td>" + getDepartmentName(studentList[i].departmentId) + "</td>";
             tableData += "</tr>";

@@ -1,9 +1,6 @@
 package com.dbDesign.Jacky.model.entity;
 
-import com.baomidou.mybatisplus.annotation.FieldFill;
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.*;
 import lombok.Data;
 
 import java.math.BigDecimal;
@@ -19,6 +16,7 @@ import java.util.Calendar;
  * @Description
  **/
 @Data
+@TableName("course_5062")
 public class Course {
     // 课程号
     @TableId(type = IdType.AUTO)

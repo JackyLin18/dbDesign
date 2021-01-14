@@ -1,5 +1,6 @@
 package com.dbDesign.Jacky.model.entity.view;
 
+import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 
 /**
@@ -8,6 +9,7 @@ import lombok.Data;
  * @Description
  **/
 @Data
+@TableName("grade_report_5062")
 public class GradeReportView {
     // 课程号
     private Integer courseId;

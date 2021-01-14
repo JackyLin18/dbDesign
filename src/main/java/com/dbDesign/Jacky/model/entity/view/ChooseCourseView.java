@@ -1,5 +1,6 @@
 package com.dbDesign.Jacky.model.entity.view;
 
+import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 
 import java.math.BigDecimal;
@@ -10,6 +11,7 @@ import java.math.BigDecimal;
  * @Description
  **/
 @Data
+@TableName("choose_course_view_5062")
 public class ChooseCourseView {
     // 课程号
     private Integer courseId;

@@ -14,10 +14,7 @@
 职&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;称：<label for="title"></label><input id="title"/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 专&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;业：<input id="major"/><br/>
 <input type="button" onclick="teacherSearch()" value="搜索"/>
-<input hidden="hidden" id="role"
-       th:value="${session.teacher} != null ? 'teacher' : (${session.administrator} == null ? 'student' : 'administrator')"/>
-<input type="button" style="position:absolute;top:10px;right:10px"
-       onclick="window.location.href = (document.getElementById('role').value == 'teacher' ? 'teacherMain' : 'administratorMain')"
+<input type="button" style="position:absolute;top:10px;right:10px" onclick="window.history.back(-1)"
        value="返回主页">
 <br/>
 <table border="1">
@@ -84,7 +81,6 @@
             "<td width='80'>教职工号</td>" +
             "<td width='60'>姓名</td>" +
             "<td width='60'>性别</td>" +
-            "<td width='100'>出生年月</td>" +
             "<td>学院</td>" +
             "<td width='80'>职称</td>" +
             "<td width='120'>专业</td>" +
@@ -95,7 +91,6 @@
             tableData += "<td>" + teacherList[i].id + "</td>";
             tableData += "<td>" + teacherList[i].name + "</td>";
             tableData += "<td>" + (teacherList[i].sex == 0 ? '未知' : (teacherList[i].sex == 1 ? '男' : '女')) + "</td>";
-            tableData += "<td>" + teacherList[i].birthday.slice(0, 7) + "</td>";
             tableData += "<td>" + getDepartmentName(teacherList[i].departmentId) + "</td>";
             tableData += "<td>" + teacherList[i].title + "</td>";
             tableData += "<td>" + teacherList[i].major + "</td>";

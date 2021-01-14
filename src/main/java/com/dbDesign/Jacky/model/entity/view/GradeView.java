@@ -1,5 +1,6 @@
 package com.dbDesign.Jacky.model.entity.view;
 
+import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 
 import java.math.BigDecimal;
@@ -11,6 +12,7 @@ import java.sql.Timestamp;
  * @Description
  **/
 @Data
+@TableName("grade_view_5062")
 public class GradeView {
     private Integer studentId;
     private String studentName;

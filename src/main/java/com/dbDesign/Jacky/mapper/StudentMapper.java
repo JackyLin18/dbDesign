@@ -13,10 +13,10 @@ import javax.persistence.criteria.CriteriaBuilder;
 @Repository
 @Mapper
 public interface StudentMapper extends BaseMapper<Student> {
-    @Select(value = "select password from student where id = #{studentId}")
+    @Select(value = "select password from student_5062 where id = #{studentId}")
     String selectPasswordByStudentId(Integer studentId);
 
-    @Select(value = "select * from student where id = #{studentId}")
+    @Select(value = "select * from student_5062 where id = #{studentId}")
     Student selectAllMessageByStudentId(Integer studentId);
 
     @Select("CALL delete_student(#{studentId,mode=IN,jdbcType=INTEGER}," +
